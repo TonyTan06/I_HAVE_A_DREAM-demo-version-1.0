@@ -12,6 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(I_HAVE_A_DREAM
     src/main.cpp
     src/player.cpp
+    src/character.cpp
 )
 
 target_include_directories(I_HAVE_A_DREAM PRIVATE

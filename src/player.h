@@ -1,31 +1,25 @@
 #pragma once
 
+#include "character.h"
 #include <string>
 
-class Player {
+class Player : public Character {
 public:
-    Player(std::string name, float x = 0.0F, float y = 0.0F);
+    explicit Player(std::string name); //创建了主角
 
-    void move(float directionX, float directionY, float deltaTime);
-    void takeDamage(int damage);
-    void heal(int amount);
+    void moveRight(float deltaTime); //右移
+    void moveLeft(float deltaTime); //左移
+    void jump() override; //跳跃
+    void update(float deltaTime, float gravity) override; //主角状态更新
 
-    const std::string& getName() const;
-    float getX() const;
-    float getY() const;
-    float getSpeed() const;
-    int getHealth() const;
-    int getMaxHealth() const;
-    bool isAlive() const;
+    int getJumpCount() const; //跳跃次数（可以实现二连跳）
+    int getMaxJumpCount() const; //最大跳跃次数
 
-    void setPosition(float x, float y);
-    void setSpeed(float speed);
+
 
 private:
-    std::string name_;
-    float x_;
-    float y_;
-    float speed_;
-    int health_;
-    int maxHealth_;
+    int jumpCount_;
+    int maxJumpCount_;
+    float gravityScale_; //单位是g
+
 };

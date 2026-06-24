@@ -45,7 +45,7 @@ bool Character::isAlive() const {
 } //检测存活
 
 void Character::update(float deltaTime, float gravity) {
-    if (!isAlive) return;
+    if (!isAlive()) return;
 
     if (!isGrounded_) {
         verticalVelocity_ -= gravity * deltaTime;
@@ -53,4 +53,4 @@ void Character::update(float deltaTime, float gravity) {
     } //跳跃更新函数，当不在地面上时，竖直方向上的速度=加速度对时间的积分，竖直高度=速度对时间的积分
 
     
-} //每一帧更新角色函数, 很重要！！！！所有角色逻辑都在这里面
+} //每一帧更新角色函数, 很重要！！！！所有角色的通用逻辑都在这里面

@@ -12,9 +12,11 @@ public:
     virtual void jump(); //跳跃
     void takeDamage(float damage); //受击伤害
     void heal(float value); //回血量
-    void update(float deltaTime, float gravity); //每一帧更新角色函数
+    virtual void update(float deltaTime, float gravity); //每一帧更新角色函数
     
     bool isAlive() const; //检测存活
+
+    virtual ~Character() = default;
 
 protected:
     std::string name_; //角色名字
@@ -33,7 +35,7 @@ protected:
     //我觉得可以给不同场景设置不同的重力，影响跳跃高度和下落速度
     float jumpInitialVelocity_; //角色跳跃初速度
     float verticalVelocity_; //角色当前的垂直速度
-    float gravityScale_; //角色收到的重力加速度
+    float gravityScale_; //角色收到的重力加速度，单位是g
 
     bool isGrounded_; //检测角色是否下落到实体上
 
