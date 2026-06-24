@@ -12,6 +12,7 @@ public:
     virtual void jump(); //跳跃
     void takeDamage(float damage); //受击伤害
     void heal(float value); //回血量
+    virtual void attack(); //通用攻击代码
     virtual void update(float deltaTime, float gravity); //每一帧更新角色函数
     
     bool isAlive() const; //检测存活

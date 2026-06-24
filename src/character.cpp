@@ -40,6 +40,10 @@ void Character::heal(float value) {
     health_ = std::min(maxHealth_, health_ + value);
 } //回血量
     
+void Character::attack() {
+    
+}
+
 bool Character::isAlive() const {
     return health_ > 0.0F;
 } //检测存活
