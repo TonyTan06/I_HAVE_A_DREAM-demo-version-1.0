@@ -1,80 +1,40 @@
 #include "player.h"
-
-#include <algorithm>
-#include <cmath>
 #include <utility>
 
-Player::Player(std::string name, float x, float y)
-    : name_(std::move(name)),
-      x_(x),
-      y_(y),
-      speed_(300.0F),
-      health_(100),
-      maxHealth_(100) {
+Player::Player(std::string name)
+    : Character(std::move(name)),
+      jumpCount_(0),
+      maxJumpCount_(2),
+      gravityScale_(1.0F){
+      }
+// 创建了主角，并且可以二连跳
+
+void Player::moveRight(float deltaTime) {
+    Character::moveRight(deltaTime);
+} //主角右移
+
+void Player::moveLeft(float deltaTime) {
+    Character::moveLeft(deltaTime);
+} //主角左移
+
+void Player::jump() {
+    if (jumpCount_ >= maxJumpCount_) return;
+
+    verticalVelocity_ = jumpInitialVelocity_;
+    isGrounded_ = false;
+    ++jumpCount_;
+} //角色跳跃
+
+void Player::update(float deltaTime, float gravity) {
+    Character::update(deltaTime, gravity);
+
+    if (isGrounded_) jumpCount_ = 0;
+} //主角的状态更新，主角独有的加在这里面
+
+int Player::getJumpCount() const {
+    return jumpCount_;
 }
 
-void Player::move(float directionX, float directionY, float deltaTime) {
-    const float length =
-        std::sqrt(directionX * directionX + directionY * directionY);
-
-    if (length > 0.0F) {
-        directionX /= length;
-        directionY /= length;
-    }
-
-    x_ += directionX * speed_ * deltaTime;
-    y_ += directionY * speed_ * deltaTime;
-}
-
-void Player::takeDamage(int damage) {
-    if (damage <= 0) {
-        return;
-    }
-
-    health_ = std::max(0, health_ - damage);
-}
-
-void Player::heal(int amount) {
-    if (amount <= 0 || !isAlive()) {
-        return;
-    }
-
-    health_ = std::min(maxHealth_, health_ + amount);
-}
-
-const std::string& Player::getName() const {
-    return name_;
-}
-
-float Player::getX() const {
-    return x_;
-}
-
-float Player::getY() const {
-    return y_;
-}
-
-float Player::getSpeed() const {
-    return speed_;
-}
-
-int Player::getHealth() const {
-    return health_;
-}
-
-int Player::getMaxHealth() const {
-    return maxHealth_;
-}
-
-bool Player::isAlive() const {
-    return health_ > 0;
-}
-
-void Player::setPosition(float x, float y) {
-    x_ = x;
-    y_ = y;
-}
-
-void Player::setSpeed(float speed) {
-    speed_ = std::max(0.0F, speed);
+int Player::getMaxJumpCount() const {
+    return maxJumpCount_;
 }
