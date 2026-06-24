@@ -8,9 +8,9 @@ Player::Player(std::string name)
       jumpCount_(0),
       maxJumpCount_(2),
       gravityScale_(1.0F),
-      gold_(0),
       experience_(1),
-      level_(1){
+      level_(1),
+      gold_(0){
       }
 // 创建了主角，并且可以二连跳
 
