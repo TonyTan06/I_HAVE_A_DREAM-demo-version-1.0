@@ -9,7 +9,7 @@ Player::Player(std::string name)
       maxJumpCount_(2),
       gravityScale_(1.0F),
       gold_(0),
-      experience_(0),
+      experience_(1),
       level_(1){
       }
 // 创建了主角，并且可以二连跳
@@ -55,12 +55,14 @@ void Player::addExperience(int value) {
 void Player::levelUp() {
     experience_ -= getExperienceThreshold();
     ++level_;
+    /*
     maxHealth_ += ;
     health_ = maxHealth_;
     attackDamage_ += ;
     attacksPerSecond_ += ;
     physicalDefense_ += ;
     magicalDefense_ += ;
+    */
 
     std::cout << "LEVEL UP!" << std::endl;
 }
