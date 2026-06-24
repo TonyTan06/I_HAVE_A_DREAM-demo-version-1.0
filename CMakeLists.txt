@@ -9,11 +9,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(I_HAVE_A_DREAM
+set(GAME_SOURCES
     src/main.cpp
     src/player.cpp
     src/character.cpp
 )
+
+add_executable(I_HAVE_A_DREAM ${GAME_SOURCES})
 
 target_include_directories(I_HAVE_A_DREAM PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src

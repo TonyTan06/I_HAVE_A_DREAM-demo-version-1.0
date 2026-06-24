@@ -4,6 +4,8 @@
 
 class Character {
 public:
+    static constexpr float BASE_GRAVITY = 980.0F; //基础重力加速度，单位大约是像素/秒²，1.0F 代表 1g
+
     explicit Character(std::string name);//创建人物要填写名字
 
     void moveRight(float deltaTime); //右移
@@ -13,9 +15,11 @@ public:
     void takeDamage(float damage); //受击伤害
     void heal(float value); //回血量
     virtual void attack(); //通用攻击代码
-    virtual void update(float deltaTime, float gravity); //每一帧更新角色函数
+    virtual void update(float deltaTime); //每一帧更新角色函数
     
     bool isAlive() const; //检测存活
+    float getGravityScale() const; //获取角色自身重力倍率
+    void setGravityScale(float gravityScale); //设置角色自身重力倍率，1.0F 就是 1g
 
     virtual ~Character() = default;
 
@@ -33,10 +37,10 @@ protected:
     float attacksPerSecond_; //角色每秒攻击速度
     float shield_; //角色护盾值
 
-    //我觉得可以给不同场景设置不同的重力，影响跳跃高度和下落速度
+    //不同角色可以设置不同的重力倍率，影响跳跃高度和下落速度
     float jumpInitialVelocity_; //角色跳跃初速度
     float verticalVelocity_; //角色当前的垂直速度
-    float gravityScale_; //角色收到的重力加速度，单位是g
+    float gravityScale_; //角色受到的重力倍率，1.0F 是 1g，0.5F 是半重力，2.0F 是双倍重力
 
     bool isGrounded_; //检测角色是否下落到实体上
 

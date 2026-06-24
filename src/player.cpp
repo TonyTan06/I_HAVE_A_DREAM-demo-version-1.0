@@ -7,10 +7,10 @@ Player::Player(std::string name)
     : Character(std::move(name)),
       jumpCount_(0),
       maxJumpCount_(2),
-      gravityScale_(1.0F),
       experience_(1),
       level_(1),
       gold_(0){
+        setGravityScale(1.0F);
       }
 // 创建了主角，并且可以二连跳
 
@@ -30,8 +30,8 @@ void Player::jump() {
     ++jumpCount_;
 } //角色跳跃
 
-void Player::update(float deltaTime, float gravity) {
-    Character::update(deltaTime, gravity);
+void Player::update(float deltaTime) {
+    Character::update(deltaTime);
 
     if (isGrounded_) jumpCount_ = 0;
 } //主角的状态更新，主角独有的加在这里面

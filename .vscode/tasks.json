@@ -2,32 +2,35 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Create build directory",
+            "label": "CMake: configure",
             "type": "shell",
-            "command": "/bin/mkdir",
+            "command": "cmake",
             "args": [
-                "-p",
-                "${workspaceFolder}/build"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "type": "cppbuild",
-            "label": "C/C++: clang build main.cpp",
-            "command": "/usr/bin/clang++",
-            "args": [
-                "-fcolor-diagnostics",
-                "-fansi-escape-codes",
-                "-std=c++17",
-                "-g",
-                "${workspaceFolder}/src/main.cpp",
-                "-o",
-                "${workspaceFolder}/build/main"
+                "-S",
+                "${workspaceFolder}",
+                "-B",
+                "${workspaceFolder}/build",
+                "-DCMAKE_BUILD_TYPE=Debug"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "dependsOn": "Create build directory",
+            "problemMatcher": []
+        },
+        {
+            "label": "CMake: build",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/build",
+                "--config",
+                "Debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": "CMake: configure",
             "problemMatcher": [
                 "$gcc"
             ],
@@ -35,7 +38,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Build src/main.cpp into build/main."
+            "detail": "Configure and build the project with CMake."
         }
     ]
 }

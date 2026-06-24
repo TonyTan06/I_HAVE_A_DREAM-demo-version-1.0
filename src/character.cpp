@@ -6,7 +6,17 @@ Character::Character(std::string name)
     : name_(std::move(name)),
       x_(0.0F),
       y_(0.0F),
+      moveSpeed_(300.0F),
+      physicalDefense_(0.0F),
+      magicalDefense_(0.0F),
+      health_(100.0F),
+      maxHealth_(100.0F),
+      attackDamage_(10.0F),
+      attacksPerSecond_(1.0F),
+      shield_(0.0F),
+      jumpInitialVelocity_(650.0F),
       verticalVelocity_(0.0F),
+      gravityScale_(1.0F),
       isGrounded_(true)
 {
 } //输入角色名字就创建了，里面包含基础属性，具体数值不在这里调整，这只是通用配置。
@@ -48,11 +58,23 @@ bool Character::isAlive() const {
     return health_ > 0.0F;
 } //检测存活
 
-void Character::update(float deltaTime, float gravity) {
+float Character::getGravityScale() const {
+    return gravityScale_;
+} //获取角色自身重力倍率
+
+void Character::setGravityScale(float gravityScale) {
+    if (gravityScale < 0.0F) return;
+
+    gravityScale_ = gravityScale;
+} //设置角色自身重力倍率
+
+void Character::update(float deltaTime) {
     if (!isAlive()) return;
 
+    const float actualGravity = BASE_GRAVITY * gravityScale_;
+
     if (!isGrounded_) {
-        verticalVelocity_ -= gravity * deltaTime;
+        verticalVelocity_ -= actualGravity * deltaTime;
         y_ += verticalVelocity_ * deltaTime;
     } //跳跃更新函数，当不在地面上时，竖直方向上的速度=加速度对时间的积分，竖直高度=速度对时间的积分
 
