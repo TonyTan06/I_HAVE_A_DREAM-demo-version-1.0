@@ -10,7 +10,7 @@ public:
     void moveRight(float deltaTime); //右移
     void moveLeft(float deltaTime); //左移
     void jump() override; //跳跃
-    void update(float deltaTime, float gravity) override; //主角状态更新
+    void update(float deltaTime) override; //主角状态更新
     void addGold(int value); //获得金币
     void addExperience(int value); //获得经验
     void levelUp(); //主角升级
@@ -26,7 +26,6 @@ public:
 private:
     int jumpCount_;
     int maxJumpCount_;
-    float gravityScale_; //单位是g
 
     int experience_; //主角经验值
     int level_; //主角等级
