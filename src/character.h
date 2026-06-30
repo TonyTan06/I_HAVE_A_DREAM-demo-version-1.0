@@ -4,7 +4,7 @@
 
 class Character {
 public:
-    static constexpr float BASE_GRAVITY = 980.0F; //基础重力加速度，单位大约是像素/秒²，1.0F 代表 1g
+    static constexpr float BASE_GRAVITY = 980.0F; //基础重力加速度，单位大约是像素/秒²。可根据比例尺更改
 
     explicit Character(std::string name);//创建人物要填写名字
 
