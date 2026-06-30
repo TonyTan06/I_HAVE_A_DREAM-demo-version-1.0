@@ -3,3 +3,5 @@ build/
 *.dSYM/
 
 .vscode/
+
+src/.DS_Store
