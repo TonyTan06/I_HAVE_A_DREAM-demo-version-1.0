@@ -47,8 +47,14 @@ if(BUILD_TESTING)
     FetchContent_MakeAvailable(googletest)
 
     file(GLOB TEST_SOURCES CONFIGURE_DEPENDS
-        "${CMAKE_CURRENT_SOURCE_DIR}/tests/*_test.cpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/tests/*_test.cpp"
     )
+
+    if(NOT TEST_SOURCES)
+      message(FATAL_ERROR
+        "No test sources found. Add at least one file matching tests/*_test.cpp."
+      )
+    endif()
 
     add_executable(game_tests ${TEST_SOURCES})
     target_link_libraries(game_tests PRIVATE game_domain GTest::gtest_main)
