@@ -12,6 +12,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(GAME_SOURCES
     src/main.cpp
     src/player.cpp
+    src/enemy.cpp
+    src/item.cpp
     src/character.cpp
 )
 
