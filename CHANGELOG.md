@@ -9,7 +9,32 @@
 - 完善敌人 AI：巡逻、玩家检测、追踪和攻击。
 - 为敌人掉落表补充实际掉落数量计算。
 - 在 `Item` 基类之上实现武器、装备和消耗品。
-- 接入 raylib 图形、输入、动画与游戏主循环。
+- 创建游戏场景管理系统，并逐步接入输入、动画和资源管理。
+
+## 2026-07-01：raylib 图形窗口与调试配置 (feature/scene)
+
+### 新增
+
+- 将 raylib 源码加入项目的 `external/raylib` 目录。
+- 在 CMake 中通过 `add_subdirectory(external/raylib)` 构建 raylib。
+- 将主程序与 `raylib` 和现有 `game_domain` 游戏逻辑库链接。
+- 在 `main.cpp` 中创建尺寸为 `800 × 450` 的游戏窗口。
+- 新增以 `WindowShouldClose()` 为退出条件的基础游戏循环。
+- 将目标帧率设置为 `60 FPS`。
+- 新增基础绘制流程：`BeginDrawing()`、清理背景、绘制文字和 `EndDrawing()`。
+- 新增 macOS LLDB 和 Windows MSVC 调试配置。
+- 新增 CMake Debug 配置与构建任务，按 F5 时自动完成配置和编译。
+
+### 调整
+
+- 关闭 raylib 自带示例和游戏构建，缩短项目编译时间。
+- 为 macOS 补充 IOKit、Cocoa 和 OpenGL 框架链接。
+- 调试构建时关闭尚未配置完整的测试目标，避免缺少测试文件导致 CMake 配置终止。
+- 将控制台 `hello world` 程序替换为可显示 `Hello raylib!` 的图形窗口。
+
+### GitHub
+
+- 当前改动位于 `feature/scene` 分支，尚未提交对应的 Pull Request。
 
 ## 2026-06-30：敌人与物品系统
 

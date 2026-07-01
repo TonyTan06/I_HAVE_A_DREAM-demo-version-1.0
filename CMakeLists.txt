@@ -6,10 +6,22 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include(CTest)
 include(FetchContent)
 
-# Keep application startup separate from reusable game/domain code.
+option(ENABLE_TESTS "Enable tests" OFF)
+
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    raylib
+    GIT_REPOSITORY https://github.com/raysan5/raylib.git
+    GIT_TAG 5.5
+    GIT_SHALLOW TRUE
+)
+
+FetchContent_MakeAvailable(raylib)
+
 set(GAME_DOMAIN_SOURCES
     src/character.cpp
     src/player.cpp
@@ -18,12 +30,17 @@ set(GAME_DOMAIN_SOURCES
 )
 
 add_library(game_domain ${GAME_DOMAIN_SOURCES})
+
 target_include_directories(game_domain PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 add_executable(I_HAVE_A_DREAM src/main.cpp)
-target_link_libraries(I_HAVE_A_DREAM PRIVATE game_domain)
+
+target_link_libraries(I_HAVE_A_DREAM PRIVATE
+    game_domain
+    raylib
+)
 
 function(enable_project_warnings target)
     if(MSVC)
@@ -36,8 +53,17 @@ endfunction()
 enable_project_warnings(game_domain)
 enable_project_warnings(I_HAVE_A_DREAM)
 
-if(BUILD_TESTING)
-    # GoogleTest is downloaded by CMake the first time you configure the project.
+if(APPLE)
+    target_link_libraries(I_HAVE_A_DREAM PRIVATE
+        "-framework IOKit"
+        "-framework Cocoa"
+        "-framework OpenGL"
+    )
+endif()
+
+if(ENABLE_TESTS)
+    include(CTest)
+
     FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
@@ -47,13 +73,13 @@ if(BUILD_TESTING)
     FetchContent_MakeAvailable(googletest)
 
     file(GLOB TEST_SOURCES CONFIGURE_DEPENDS
-      "${CMAKE_CURRENT_SOURCE_DIR}/tests/*_test.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/*_test.cpp"
     )
 
     if(NOT TEST_SOURCES)
-      message(FATAL_ERROR
-        "No test sources found. Add at least one file matching tests/*_test.cpp."
-      )
+        message(FATAL_ERROR
+            "No test sources found. Add at least one file matching tests/*_test.cpp."
+        )
     endif()
 
     add_executable(game_tests ${TEST_SOURCES})
@@ -63,8 +89,6 @@ if(BUILD_TESTING)
     include(GoogleTest)
     gtest_discover_tests(game_tests)
 
-    # This test fails CI when a production source file does not have
-    # tests/<source_name>_test.cpp. main.cpp is deliberately excluded.
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
     add_test(
         NAME test_file_coverage
