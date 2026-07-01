@@ -6,4 +6,5 @@ target/
 log/
 uploads/
 build/
+build-asan/
 *.dSYM/

@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(FetchContent)
 
 option(ENABLE_TESTS "Enable tests" OFF)
+option(ENABLE_SANITIZERS "Enable memory error and leak checking" OFF)
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
@@ -50,8 +51,32 @@ function(enable_project_warnings target)
     endif()
 endfunction()
 
+function(enable_project_sanitizers target)
+    if(NOT ENABLE_SANITIZERS)
+        return()
+    endif()
+
+    if(MSVC)
+        target_compile_options(${target} PRIVATE /fsanitize=address /Zi)
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        target_compile_options(${target} PRIVATE
+            -fsanitize=address,undefined
+            -fno-omit-frame-pointer
+        )
+        target_link_options(${target} PRIVATE
+            -fsanitize=address,undefined
+        )
+    else()
+        message(WARNING
+            "ENABLE_SANITIZERS is ON, but ${CMAKE_CXX_COMPILER_ID} is not supported."
+        )
+    endif()
+endfunction()
+
 enable_project_warnings(game_domain)
 enable_project_warnings(I_HAVE_A_DREAM)
+enable_project_sanitizers(game_domain)
+enable_project_sanitizers(I_HAVE_A_DREAM)
 
 if(APPLE)
     target_link_libraries(I_HAVE_A_DREAM PRIVATE

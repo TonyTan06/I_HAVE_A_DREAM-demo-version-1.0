@@ -10,6 +10,9 @@
 int main() {
     Player player ("PLAYER");
 
+    int* leakTest = new int[100];
+    leakTest[0] = 1;
+
     
     InitWindow(800, 450, "I HAVE A DREAM");
     SetTargetFPS(60);
