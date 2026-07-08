@@ -6,46 +6,43 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+include(FetchContent)
+
 option(ENABLE_TESTS "Enable tests" OFF)
 
 # ============================================================
-# Local dependencies
+# raylib dependency
 # ============================================================
-# Expected structure:
-#
-# project-root/
-# ├── third_party/
-# │   ├── raylib/
-# │   └── googletest/
-# ├── src/
-# ├── tests/
-# └── CMakeLists.txt
-#
-# raylib should be version 5.5.
-# googletest should be version 1.16.0.
+# Priority:
+# 1. Use local third_party/raylib if it exists
+# 2. Otherwise download raylib using FetchContent
 # ============================================================
 
-set(RAYLIB_SOURCE_DIR
-    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/raylib"
-    CACHE PATH
-    "Path to local raylib source directory"
-)
-
-if(NOT EXISTS "${RAYLIB_SOURCE_DIR}/CMakeLists.txt")
-    message(FATAL_ERROR
-        "raylib was not found at: ${RAYLIB_SOURCE_DIR}\n"
-        "Please place raylib source code inside third_party/raylib."
-    )
-endif()
+set(LOCAL_RAYLIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/raylib")
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(
-    "${RAYLIB_SOURCE_DIR}"
-    "${CMAKE_BINARY_DIR}/third_party/raylib"
-    EXCLUDE_FROM_ALL
-)
+if(EXISTS "${LOCAL_RAYLIB_DIR}/CMakeLists.txt")
+    message(STATUS "Using local raylib from third_party/raylib")
+
+    add_subdirectory(
+        "${LOCAL_RAYLIB_DIR}"
+        "${CMAKE_BINARY_DIR}/third_party/raylib"
+        EXCLUDE_FROM_ALL
+    )
+else()
+    message(STATUS "Local raylib not found. Fetching raylib from GitHub.")
+
+    FetchContent_Declare(
+        raylib
+        GIT_REPOSITORY https://github.com/raysan5/raylib.git
+        GIT_TAG 5.5
+        GIT_SHALLOW TRUE
+    )
+
+    FetchContent_MakeAvailable(raylib)
+endif()
 
 # ============================================================
 # Game domain library
@@ -106,26 +103,38 @@ endif()
 if(ENABLE_TESTS)
     include(CTest)
 
-    set(GTEST_SOURCE_DIR
-        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest"
-        CACHE PATH
-        "Path to local GoogleTest source directory"
-    )
+    # ========================================================
+    # GoogleTest dependency
+    # ========================================================
+    # Priority:
+    # 1. Use local third_party/googletest if it exists
+    # 2. Otherwise download GoogleTest using FetchContent
+    # ========================================================
 
-    if(NOT EXISTS "${GTEST_SOURCE_DIR}/CMakeLists.txt")
-        message(FATAL_ERROR
-            "GoogleTest was not found at: ${GTEST_SOURCE_DIR}\n"
-            "Please place GoogleTest source code inside third_party/googletest."
-        )
-    endif()
+    set(LOCAL_GTEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest")
 
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 
-    add_subdirectory(
-        "${GTEST_SOURCE_DIR}"
-        "${CMAKE_BINARY_DIR}/third_party/googletest"
-        EXCLUDE_FROM_ALL
-    )
+    if(EXISTS "${LOCAL_GTEST_DIR}/CMakeLists.txt")
+        message(STATUS "Using local GoogleTest from third_party/googletest")
+
+        add_subdirectory(
+            "${LOCAL_GTEST_DIR}"
+            "${CMAKE_BINARY_DIR}/third_party/googletest"
+            EXCLUDE_FROM_ALL
+        )
+    else()
+        message(STATUS "Local GoogleTest not found. Fetching GoogleTest from GitHub.")
+
+        FetchContent_Declare(
+            googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG v1.16.0
+            GIT_SHALLOW TRUE
+        )
+
+        FetchContent_MakeAvailable(googletest)
+    endif()
 
     file(GLOB TEST_SOURCES CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/*_test.cpp"
