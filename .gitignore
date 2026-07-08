@@ -7,3 +7,4 @@ log/
 uploads/
 build/
 *.dSYM/
+build-asan/
