@@ -9,3 +9,4 @@ build/
 *.dSYM/
 third_party/
 build-asan/
+third_party/
