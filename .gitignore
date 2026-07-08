@@ -8,3 +8,4 @@ uploads/
 build/
 *.dSYM/
 third_party/
+build-asan/
