@@ -6,21 +6,50 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include(FetchContent)
-
 option(ENABLE_TESTS "Enable tests" OFF)
+
+# ============================================================
+# Local dependencies
+# ============================================================
+# Expected structure:
+#
+# project-root/
+# ├── third_party/
+# │   ├── raylib/
+# │   └── googletest/
+# ├── src/
+# ├── tests/
+# └── CMakeLists.txt
+#
+# raylib should be version 5.5.
+# googletest should be version 1.16.0.
+# ============================================================
+
+set(RAYLIB_SOURCE_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/raylib"
+    CACHE PATH
+    "Path to local raylib source directory"
+)
+
+if(NOT EXISTS "${RAYLIB_SOURCE_DIR}/CMakeLists.txt")
+    message(FATAL_ERROR
+        "raylib was not found at: ${RAYLIB_SOURCE_DIR}\n"
+        "Please place raylib source code inside third_party/raylib."
+    )
+endif()
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
 
-FetchContent_Declare(
-    raylib
-    GIT_REPOSITORY https://github.com/raysan5/raylib.git
-    GIT_TAG 5.5
-    GIT_SHALLOW TRUE
+add_subdirectory(
+    "${RAYLIB_SOURCE_DIR}"
+    "${CMAKE_BINARY_DIR}/third_party/raylib"
+    EXCLUDE_FROM_ALL
 )
 
-FetchContent_MakeAvailable(raylib)
+# ============================================================
+# Game domain library
+# ============================================================
 
 set(GAME_DOMAIN_SOURCES
     src/character.cpp
@@ -35,12 +64,20 @@ target_include_directories(game_domain PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+# ============================================================
+# Main executable
+# ============================================================
+
 add_executable(I_HAVE_A_DREAM src/main.cpp)
 
 target_link_libraries(I_HAVE_A_DREAM PRIVATE
     game_domain
     raylib
 )
+
+# ============================================================
+# Warnings
+# ============================================================
 
 function(enable_project_warnings target)
     if(MSVC)
@@ -53,6 +90,7 @@ endfunction()
 enable_project_warnings(game_domain)
 enable_project_warnings(I_HAVE_A_DREAM)
 
+# macOS frameworks needed by raylib
 if(APPLE)
     target_link_libraries(I_HAVE_A_DREAM PRIVATE
         "-framework IOKit"
@@ -61,16 +99,33 @@ if(APPLE)
     )
 endif()
 
+# ============================================================
+# Tests
+# ============================================================
+
 if(ENABLE_TESTS)
     include(CTest)
 
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG v1.16.0
-        GIT_SHALLOW TRUE
+    set(GTEST_SOURCE_DIR
+        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest"
+        CACHE PATH
+        "Path to local GoogleTest source directory"
     )
-    FetchContent_MakeAvailable(googletest)
+
+    if(NOT EXISTS "${GTEST_SOURCE_DIR}/CMakeLists.txt")
+        message(FATAL_ERROR
+            "GoogleTest was not found at: ${GTEST_SOURCE_DIR}\n"
+            "Please place GoogleTest source code inside third_party/googletest."
+        )
+    endif()
+
+    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+
+    add_subdirectory(
+        "${GTEST_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/third_party/googletest"
+        EXCLUDE_FROM_ALL
+    )
 
     file(GLOB TEST_SOURCES CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/*_test.cpp"
@@ -83,13 +138,19 @@ if(ENABLE_TESTS)
     endif()
 
     add_executable(game_tests ${TEST_SOURCES})
-    target_link_libraries(game_tests PRIVATE game_domain GTest::gtest_main)
+
+    target_link_libraries(game_tests PRIVATE
+        game_domain
+        GTest::gtest_main
+    )
+
     enable_project_warnings(game_tests)
 
     include(GoogleTest)
     gtest_discover_tests(game_tests)
 
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
     add_test(
         NAME test_file_coverage
         COMMAND ${Python3_EXECUTABLE}
