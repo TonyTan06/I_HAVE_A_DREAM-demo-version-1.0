@@ -23,24 +23,34 @@ Scene::Scene()
       meleeAttackEffectElapsedTime_(0.0F),
       meleeEnemyExperienceAwarded_(false),
       rangedEnemyExperienceAwarded_(false) {
+    // 两个敌人固定出生在平台右侧，近战兵在远程兵左方 100px。
     rangedEnemy_.setPosition(platform_.x + platform_.width - PLAYER_WIDTH, 0.0F);
     meleeEnemy_.setPosition(rangedEnemy_.getX() - ENEMY_SPACING, 0.0F);
 }
 
 void Scene::update(float deltaTime) {
-    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
+    // 这两个布尔值表示本帧的水平输入，之后也用于决定 L 闪避的方向。
+    const bool moveLeftPressed = IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT);
+    const bool moveRightPressed = IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT);
+    if (!player_.isDodging() && moveLeftPressed) {
         player_.moveLeft(deltaTime);
     }
-    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
+    if (!player_.isDodging() && moveRightPressed) {
         player_.moveRight(deltaTime);
     }
     if (IsKeyPressed(KEY_SPACE)) {
         player_.jump();
     }
+    // 防御需要持续按住；闪避期间角色仍可维持防御状态，但敌人不会锁定闪避中的玩家。
     player_.setDefending(IsKeyDown(KEY_U));
     const bool attackPressed = IsKeyPressed(KEY_J) && !player_.isDefending();
     if (IsKeyPressed(KEY_K) && !player_.isDefending()) {
         player_.rangedAttack();
+    }
+    if (IsKeyPressed(KEY_L)) {
+        // 优先使用本帧按下的方向；没有水平输入时沿上次朝向闪避。
+        const bool dodgeRight = moveRightPressed || (!moveLeftPressed && player_.isFacingRight());
+        player_.startDodge(dodgeRight);
     }
 
     player_.update(deltaTime);
@@ -60,6 +70,7 @@ void Scene::update(float deltaTime) {
     const float maxPlayerX = platform_.x + platform_.width - PLAYER_WIDTH;
     player_.setPosition(
         std::clamp(player_.getX(), platform_.x, maxPlayerX), player_.getY());
+    // 记录实际 x 位移，而不是按键时间：碰墙、折返和闪避都会按真实移动距离计入影子阈值。
     const float frameHorizontalDistance = std::abs(player_.getX() - previousPlayerX_);
     previousPlayerX_ = player_.getX();
 
@@ -95,11 +106,14 @@ void Scene::update(float deltaTime) {
     }
 
     const auto findNearestEnemyTarget = [&](const Enemy& enemy) -> Character* {
+        // target 保存范围内最近的非同阵营可攻击单位；初始空表示本帧没有目标。
         Character* target = nullptr;
         float nearestDistance = ENEMY_DETECTION_RANGE;
 
         const auto considerTarget = [&](Character& candidate) {
+            // 死亡、同阵营及闪避中的玩家不能成为敌军攻击目标。
             if (!candidate.isAlive() || candidate.getFaction() == enemy.getFaction()) return;
+            if (&candidate == &player_ && player_.isDodging()) return;
 
             const float distance = std::abs(candidate.getX() - enemy.getX());
             if (distance <= nearestDistance) {
@@ -153,6 +167,7 @@ void Scene::update(float deltaTime) {
     }
 
     for (auto iterator = projectiles_.begin(); iterator != projectiles_.end();) {
+        // iterator 使用 erase 返回值，避免删除子弹后继续使用失效迭代器。
         iterator->x += iterator->direction * PROJECTILE_SPEED * deltaTime;
         iterator->travelledDistance += PROJECTILE_SPEED * deltaTime;
         bool hitDamageableTarget = false;
@@ -163,8 +178,10 @@ void Scene::update(float deltaTime) {
 
         const auto damageTarget = [&](Character& target, const Rectangle& hitbox,
                                       bool& hasBeenHit) {
+            // 同阵营、死亡、闪避中的玩家都会让子弹继续飞行，不会消耗该子弹。
             if (hitDamageableTarget || hasBeenHit || !target.isAlive() ||
                 target.getFaction() == iterator->faction) return;
+            if (&target == &player_ && player_.isDodging()) return;
             if (!CheckCollisionCircleRec(
                     Vector2{iterator->x, iterator->y}, PROJECTILE_RADIUS, hitbox)) return;
 
@@ -257,6 +274,7 @@ void Scene::update(float deltaTime) {
     }
 
     const auto awardEnemyExperience = [&](const Enemy& enemy, bool& experienceAwarded) {
+        // 经验标记防止敌人 5 秒尸体期的每一帧都重复加经验。
         if (enemy.isAlive()) {
             experienceAwarded = false;
             return;
@@ -378,6 +396,7 @@ void Scene::draw() const {
     }
 
     const auto drawEnemy = [&](const Enemy& enemy, Color eyeColor) {
+        // respawning 控制敌人尸体期的浅色身体和黄色复活倒计时条。
         const float enemyTop = platform_.y - PLAYER_HEIGHT - enemy.getY();
         const int barX = static_cast<int>(enemy.getX());
         const int barY = static_cast<int>(enemyTop - 10.0F);
@@ -406,6 +425,18 @@ void Scene::draw() const {
         static_cast<int>(PLAYER_HEIGHT),
         Color{72, 183, 255, 255});
     const float playerTop = platform_.y - PLAYER_HEIGHT - player_.getY();
+    if (player_.isDodgeCoolingDown()) {
+        // 背向由当前朝向决定：右向时条在角色左侧，左向时条在角色右侧。
+        const float cooldownProgress = std::clamp(player_.getDodgeCooldownProgress(), 0.0F, 1.0F);
+        const int barX = static_cast<int>(player_.isFacingRight()
+            ? player_.getX() - 6.0F
+            : player_.getX() + PLAYER_WIDTH + 2.0F);
+        const int barY = static_cast<int>(playerTop);
+        const int barHeight = static_cast<int>(PLAYER_HEIGHT);
+        const int progressHeight = static_cast<int>(barHeight * cooldownProgress);
+        DrawRectangle(barX, barY, 4, barHeight, DARKGRAY);
+        DrawRectangle(barX, barY + barHeight - progressHeight, 4, progressHeight, GREEN);
+    }
     const float playerHealthRatio = player_.getHealth() / player_.getMaxHealth();
     DrawRectangle(static_cast<int>(player_.getX()), static_cast<int>(playerTop - 10.0F),
                   static_cast<int>(PLAYER_WIDTH), 5, DARKGRAY);
@@ -453,7 +484,7 @@ void Scene::draw() const {
         DrawText(TextFormat("%.0f", displayedDamage_), static_cast<int>(damageTextX_),
                  static_cast<int>(damageTextY_), 20, YELLOW);
     }
-    DrawText("A/D or arrow keys: move    Space: jump    J: melee    K: ranged    U: defend", 20, 20, 20,
+    DrawText("A/D or arrow keys: move    Space: jump    J: melee    K: ranged    U: defend    L: dodge", 20, 20, 20,
              RAYWHITE);
     DrawText(TextFormat("Level: %d", player_.getLevel()), 20, 50, 20, RAYWHITE);
     DrawText(TextFormat("Exp: %d / %d", player_.getExperience(),

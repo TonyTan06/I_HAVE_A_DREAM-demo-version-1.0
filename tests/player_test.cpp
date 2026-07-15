@@ -73,6 +73,23 @@ TEST(PlayerTest, DefensePreventsRangedAttackRequest) {
     EXPECT_FALSE(player.consumeRangedAttackRequest());
 }
 
+TEST(PlayerTest, DodgesOneSecondOfMovementDistanceInTwoTenthsOfASecond) {
+    Player player("Johnny");
+    const float startingX = player.getX();
+
+    EXPECT_TRUE(player.startDodge(true));
+    player.update(0.2F);
+
+    EXPECT_FALSE(player.isDodging());
+    EXPECT_FLOAT_EQ(player.getX(), startingX + player.getMoveSpeed());
+    EXPECT_TRUE(player.isDodgeCoolingDown());
+    EXPECT_FALSE(player.startDodge(true));
+
+    player.update(4.8F);
+    EXPECT_FALSE(player.isDodgeCoolingDown());
+    EXPECT_TRUE(player.startDodge(false));
+}
+
 TEST(PlayerTest, AddsOnlyPositiveGold) {
     Player player("Johnny");
 

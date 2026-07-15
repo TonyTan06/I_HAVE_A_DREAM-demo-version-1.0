@@ -25,7 +25,7 @@ public:
     int getSellPrice() const; //获取物品出售价格，基础价格 * 稀有度倍率
 
 private:
-    std::string name_;
-    ItemRarity rarity_;
-    int basePrice_;
+    std::string name_; // 物品显示名称
+    ItemRarity rarity_; // 决定售价倍率的稀有度枚举
+    int basePrice_; // 未乘稀有度倍率前的基础售价
 };

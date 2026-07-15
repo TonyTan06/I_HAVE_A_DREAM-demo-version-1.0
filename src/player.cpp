@@ -11,11 +11,15 @@ Player::Player(std::string name)
       experience_(0),
       level_(1),
       gold_(0),
-      isFacingRight_(true),
+      isFacingRight_(true), // 初始朝右，使眼睛、攻击和远程子弹都默认向右
       rangedAttackCooldown_(0.0F),
       rangedAttackRequested_(false),
       isDefending_(false),
-      defenseCooldown_(0.0F) {
+      defenseCooldown_(0.0F),
+      isDodging_(false),
+      dodgeRight_(true),
+      dodgeElapsedTime_(0.0F),
+      dodgeCooldown_(0.0F) {
         setGravityScale(1.0F);
         setFaction(Faction::Friendly);
         x_ = 140.0F;
@@ -46,12 +50,27 @@ void Player::jump() {
 } //角色跳跃
 
 void Player::update(float deltaTime) {
+    // 先更新角色共有的重力、跳跃等物理状态。
     Character::update(deltaTime);
 
+    // 两个普通冷却按每帧经过的时间递减，且不会低于零。
     rangedAttackCooldown_ = std::max(0.0F, rangedAttackCooldown_ - deltaTime);
     defenseCooldown_ = std::max(0.0F, defenseCooldown_ - deltaTime);
     if (defenseCooldown_ > 0.0F) {
         isDefending_ = false;
+    }
+    dodgeCooldown_ = std::max(0.0F, dodgeCooldown_ - deltaTime);
+
+    if (isDodging_) {
+        // movementTime 防止低帧率时让最后一帧的移动超过 0.2 秒。
+        const float movementTime = std::min(deltaTime, DODGE_DURATION - dodgeElapsedTime_);
+        // 闪避总距离为“当前移速 × 1 秒”，因此必须在 DODGE_DURATION 内以该速度完成。
+        const float dodgeSpeed = moveSpeed_ / DODGE_DURATION;
+        x_ += (dodgeRight_ ? 1.0F : -1.0F) * dodgeSpeed * movementTime;
+        dodgeElapsedTime_ += movementTime;
+        if (dodgeElapsedTime_ >= DODGE_DURATION) {
+            isDodging_ = false;
+        }
     }
 
     if (isGrounded_) jumpCount_ = 0;
@@ -131,6 +150,30 @@ bool Player::blockNextAttack() {
     isDefending_ = false;
     defenseCooldown_ = DEFENSE_COOLDOWN;
     return true;
+}
+
+bool Player::startDodge(bool dodgeRight) {
+    // 闪避本体和闪避冷却期间均不能再次触发。
+    if (isDodging_ || dodgeCooldown_ > 0.0F) return false;
+
+    isDodging_ = true;
+    dodgeRight_ = dodgeRight;
+    dodgeElapsedTime_ = 0.0F;
+    dodgeCooldown_ = DODGE_COOLDOWN;
+    return true;
+}
+
+bool Player::isDodging() const {
+    return isDodging_;
+}
+
+bool Player::isDodgeCoolingDown() const {
+    return dodgeCooldown_ > 0.0F;
+}
+
+float Player::getDodgeCooldownProgress() const {
+    // 绘制时用“已冷却比例”，所以条会从空逐渐填满。
+    return 1.0F - dodgeCooldown_ / DODGE_COOLDOWN;
 }
 
 int Player::getExperienceThreshold() const{

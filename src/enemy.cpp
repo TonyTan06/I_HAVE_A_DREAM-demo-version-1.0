@@ -41,9 +41,11 @@ std::vector<LootItem> Enemy::dropLoot() {
 void Enemy::update(float deltaTime)
 {
     if (!isAlive()) {
+        // 死亡敌人停在原地，不再受重力、攻击冷却或 AI 逻辑影响。
         isRespawning_ = true;
         respawnElapsedTime_ += deltaTime;
         if (respawnElapsedTime_ >= RESPAWN_DURATION) {
+            // 原地回满血，下一帧重新作为可攻击、可受击单位参与场景。
             health_ = maxHealth_;
             isRespawning_ = false;
             respawnElapsedTime_ = 0.0F;
