@@ -2,6 +2,12 @@
 
 #include <string>
 
+enum class Faction {
+    Friendly, // 玩家所属阵营
+    Enemy,    // 敌人所属阵营
+    Neutral   // 影子等可被任意阵营攻击的第三方单位
+};
+
 class Character {
 public:
     static constexpr float BASE_GRAVITY = 980.0F; //基础重力加速度，单位大约是像素/秒²。可根据比例尺更改
@@ -18,6 +24,22 @@ public:
     virtual void update(float deltaTime); //每一帧更新角色函数
     
     bool isAlive() const; //检测存活
+    bool isGrounded() const; // 是否站在平台或地面上
+    float getHealth() const; // 当前生命值，用于状态条和受击判定
+    float getX() const; //获取角色 x 轴位置
+    float getY() const; //获取角色相对地面的高度
+    void setPosition(float x, float y); //设置角色位置
+    void land(); //将角色放回地面并重置竖直速度
+    float getMoveSpeed() const;
+    float getPhysicalDefense() const;
+    float getMagicalDefense() const;
+    float getMaxHealth() const;
+    float getAttackDamage() const;
+    float getAttacksPerSecond() const;
+    float getShield() const;
+    float getJumpInitialVelocity() const;
+    Faction getFaction() const; // 获取阵营，供战斗目标筛选使用
+    void setFaction(Faction faction); // 设置角色所属阵营
     float getGravityScale() const; //获取角色自身重力倍率
     void setGravityScale(float gravityScale); //设置角色自身重力倍率，1.0F 就是 1g
 
@@ -43,6 +65,7 @@ protected:
     float gravityScale_; //角色受到的重力倍率，1.0F 是 1g，0.5F 是半重力，2.0F 是双倍重力
 
     bool isGrounded_; //检测角色是否下落到实体上
+    Faction faction_;
 
     
 

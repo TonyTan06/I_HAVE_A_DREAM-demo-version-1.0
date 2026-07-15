@@ -15,6 +15,7 @@ public:
     void addExperience(int value); //获得经验
     void levelUp(); //主角升级
     void attack() override;
+    void attack(Character& target); // 对目标造成当前攻击伤害
 
     int getJumpCount() const; //跳跃次数（可以实现二连跳）
     int getMaxJumpCount() const; //最大跳跃次数
