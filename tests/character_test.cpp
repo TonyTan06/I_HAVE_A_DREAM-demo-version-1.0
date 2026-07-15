@@ -17,3 +17,11 @@ TEST(CharacterTest, RejectsNegativeGravityScale) {
 
     EXPECT_FLOAT_EQ(character.getGravityScale(), 2.0F);
 }
+
+TEST(CharacterTest, ProvidesAnOverridableRangedAttackFramework) {
+    Character character("Test Character");
+
+    character.rangedAttack();
+
+    SUCCEED();
+}

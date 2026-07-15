@@ -16,6 +16,9 @@ public:
     void levelUp(); //主角升级
     void attack() override;
     void attack(Character& target); // 对目标造成当前攻击伤害
+    void rangedAttack() override; // 请求一次远程攻击，受自身攻击间隔限制
+    bool isFacingRight() const; // 当前朝向，供眼睛与近战攻击判定使用
+    bool consumeRangedAttackRequest(); // 供场景读取并清除本帧的子弹生成请求
 
     int getJumpCount() const; //跳跃次数（可以实现二连跳）
     int getMaxJumpCount() const; //最大跳跃次数
@@ -31,5 +34,10 @@ private:
     int experience_; //主角经验值
     int level_; //主角等级
     int gold_; //主角金币
+    bool isFacingRight_; // 最近一次横向移动方向，初始向右
+    float rangedAttackCooldown_; // 下次可发射前的剩余冷却时间
+    bool rangedAttackRequested_; // 本帧是否需要由场景生成子弹
+
+    static constexpr float RANGED_ATTACK_INTERVAL = 0.75F;
 
 };

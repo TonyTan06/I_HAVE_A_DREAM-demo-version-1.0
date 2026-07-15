@@ -21,6 +21,8 @@ public:
     void takeDamage(float damage); //受击伤害
     void heal(float value); //回血量
     virtual void attack(); //通用攻击代码
+    // 远程攻击框架。具体投射物、伤害、冷却和特效由派生角色自行实现。
+    virtual void rangedAttack();
     virtual void update(float deltaTime); //每一帧更新角色函数
     
     bool isAlive() const; //检测存活

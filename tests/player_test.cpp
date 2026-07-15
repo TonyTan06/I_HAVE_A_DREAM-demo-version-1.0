@@ -12,6 +12,31 @@ TEST(PlayerTest, StartsAtLevelOneWithNoGold) {
     EXPECT_FLOAT_EQ(player.getMaxHealth(), 10.0F);
     EXPECT_FLOAT_EQ(player.getAttackDamage(), 5.0F);
     EXPECT_EQ(player.getFaction(), Faction::Friendly);
+    EXPECT_TRUE(player.isFacingRight());
+}
+
+TEST(PlayerTest, FacesTheDirectionOfItsLastHorizontalMovement) {
+    Player player("Johnny");
+
+    player.moveLeft(0.0F);
+    EXPECT_FALSE(player.isFacingRight());
+
+    player.moveRight(0.0F);
+    EXPECT_TRUE(player.isFacingRight());
+}
+
+TEST(PlayerTest, LimitsRangedAttackToOneShotEveryThreeQuartersOfASecond) {
+    Player player("Johnny");
+
+    player.rangedAttack();
+    EXPECT_TRUE(player.consumeRangedAttackRequest());
+
+    player.rangedAttack();
+    EXPECT_FALSE(player.consumeRangedAttackRequest());
+
+    player.update(0.75F);
+    player.rangedAttack();
+    EXPECT_TRUE(player.consumeRangedAttackRequest());
 }
 
 TEST(PlayerTest, AddsOnlyPositiveGold) {

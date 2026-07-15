@@ -8,11 +8,14 @@ Scene::Scene()
       platform_{0.0F, 360.0F, 800.0F, 40.0F},
       recordedPlayerX_(player_.getX()),
       recordedPlayerY_(player_.getY()),
+      previousPlayerX_(player_.getX()),
+      accumulatedPlayerHorizontalDistance_(0.0F),
       shadowElapsedTime_(0.0F),
       damageTextElapsedTime_(0.0F),
       damageTextX_(0.0F),
       damageTextY_(0.0F),
-      displayedDamage_(0.0F) {
+      displayedDamage_(0.0F),
+      attackEffectElapsedTime_(0.0F) {
 }
 
 void Scene::update(float deltaTime) {
@@ -25,6 +28,10 @@ void Scene::update(float deltaTime) {
     if (IsKeyPressed(KEY_SPACE)) {
         player_.jump();
     }
+    const bool attackPressed = IsKeyPressed(KEY_J);
+    if (IsKeyPressed(KEY_K)) {
+        player_.rangedAttack();
+    }
 
     player_.update(deltaTime);
 
@@ -35,10 +42,59 @@ void Scene::update(float deltaTime) {
     const float maxPlayerX = platform_.x + platform_.width - PLAYER_WIDTH;
     player_.setPosition(
         std::clamp(player_.getX(), platform_.x, maxPlayerX), player_.getY());
+    const float frameHorizontalDistance = std::abs(player_.getX() - previousPlayerX_);
+    previousPlayerX_ = player_.getX();
 
     // 伤害数字只保留一秒，与影子是否已经消失无关。
     if (damageTextElapsedTime_ > 0.0F) {
         damageTextElapsedTime_ = std::max(0.0F, damageTextElapsedTime_ - deltaTime);
+    }
+    if (attackEffectElapsedTime_ > 0.0F) {
+        attackEffectElapsedTime_ =
+            std::max(0.0F, attackEffectElapsedTime_ - deltaTime);
+    }
+    if (attackPressed) {
+        attackEffectElapsedTime_ = ATTACK_EFFECT_LIFETIME;
+    }
+
+    if (player_.consumeRangedAttackRequest()) {
+        const float direction = player_.isFacingRight() ? 1.0F : -1.0F;
+        const float projectileX = player_.isFacingRight()
+            ? player_.getX() + PLAYER_WIDTH + PROJECTILE_RADIUS
+            : player_.getX() - PROJECTILE_RADIUS;
+        projectiles_.push_back(Projectile{
+            projectileX,
+            platform_.y - PLAYER_HEIGHT / 2.0F - player_.getY(),
+            direction,
+            0.0F});
+    }
+
+    for (auto iterator = projectiles_.begin(); iterator != projectiles_.end();) {
+        iterator->x += iterator->direction * PROJECTILE_SPEED * deltaTime;
+        iterator->travelledDistance += PROJECTILE_SPEED * deltaTime;
+
+        bool hitShadow = false;
+        if (playerShadow_.has_value()) {
+            const Rectangle shadowHitbox{
+                playerShadow_->getX(),
+                platform_.y - PLAYER_HEIGHT - playerShadow_->getY(),
+                PLAYER_WIDTH, PLAYER_HEIGHT};
+            hitShadow = CheckCollisionCircleRec(
+                Vector2{iterator->x, iterator->y}, PROJECTILE_RADIUS, shadowHitbox);
+            if (hitShadow) {
+                player_.attack(*playerShadow_);
+                displayedDamage_ = player_.getAttackDamage();
+                damageTextElapsedTime_ = DAMAGE_TEXT_LIFETIME;
+                damageTextX_ = shadowHitbox.x + shadowHitbox.width / 2.0F;
+                damageTextY_ = shadowHitbox.y - 20.0F;
+            }
+        }
+
+        if (hitShadow || iterator->travelledDistance >= PROJECTILE_MAX_DISTANCE) {
+            iterator = projectiles_.erase(iterator);
+        } else {
+            ++iterator;
+        }
     }
 
     if (playerShadow_.has_value()) {
@@ -48,15 +104,18 @@ void Scene::update(float deltaTime) {
             playerShadow_->land();
         }
 
-        const Rectangle playerHitbox{
-            player_.getX(), platform_.y - PLAYER_HEIGHT - player_.getY(),
-            PLAYER_WIDTH, PLAYER_HEIGHT};
+        const float playerTop = platform_.y - PLAYER_HEIGHT - player_.getY();
+        const float attackX = player_.isFacingRight()
+            ? player_.getX() + PLAYER_WIDTH
+            : player_.getX() - ATTACK_RANGE;
+        const Rectangle playerAttackHitbox{
+            attackX, playerTop, ATTACK_RANGE, PLAYER_HEIGHT};
         const Rectangle shadowHitbox{
             playerShadow_->getX(),
             platform_.y - PLAYER_HEIGHT - playerShadow_->getY(),
             PLAYER_WIDTH, PLAYER_HEIGHT};
-        // J 只在主角与影子碰撞箱重叠时命中，属于近战接触攻击。
-        if (IsKeyPressed(KEY_J) && CheckCollisionRecs(playerHitbox, shadowHitbox)) {
+        // J 只命中朝向正前方 16px 的攻击框，属于近战攻击。
+        if (attackPressed && CheckCollisionRecs(playerAttackHitbox, shadowHitbox)) {
             player_.attack(*playerShadow_);
             displayedDamage_ = player_.getAttackDamage();
             damageTextElapsedTime_ = DAMAGE_TEXT_LIFETIME;
@@ -70,14 +129,15 @@ void Scene::update(float deltaTime) {
             playerShadow_.reset();
             recordedPlayerX_ = player_.getX();
             recordedPlayerY_ = player_.getY();
+            accumulatedPlayerHorizontalDistance_ = 0.0F;
             shadowElapsedTime_ = 0.0F;
         }
         return;
     }
 
-    // 跳跃高度不影响生成；仅需横向移动距离达到阈值。
-    const float horizontalDistance = std::abs(player_.getX() - recordedPlayerX_);
-    if (horizontalDistance >= SHADOW_DISTANCE) {
+    // 仅在没有影子时累加横向位移，因此折返和跳跃中的横移都会计数。
+    accumulatedPlayerHorizontalDistance_ += frameHorizontalDistance;
+    if (accumulatedPlayerHorizontalDistance_ >= SHADOW_DISTANCE) {
         playerShadow_.emplace(player_, recordedPlayerX_, recordedPlayerY_);
         shadowElapsedTime_ = 0.0F;
     }
@@ -130,10 +190,35 @@ void Scene::draw() const {
         static_cast<int>(PLAYER_WIDTH),
         static_cast<int>(PLAYER_HEIGHT),
         Color{72, 183, 255, 255});
+    const float playerTop = platform_.y - PLAYER_HEIGHT - player_.getY();
+    const float eyeX = player_.isFacingRight()
+        ? player_.getX() + PLAYER_WIDTH - 8.0F
+        : player_.getX() + 8.0F;
+    DrawCircle(static_cast<int>(eyeX), static_cast<int>(playerTop + 14.0F), 3.0F, BLACK);
+    if (attackEffectElapsedTime_ > 0.0F) {
+        const float bladeBaseX = player_.isFacingRight()
+            ? player_.getX() + PLAYER_WIDTH
+            : player_.getX();
+        const Vector2 bladeTop{bladeBaseX, playerTop};
+        const Vector2 bladeBottom{bladeBaseX, playerTop + PLAYER_HEIGHT};
+        const Vector2 bladeTip{
+            player_.isFacingRight() ? bladeBaseX + ATTACK_RANGE : bladeBaseX - ATTACK_RANGE,
+            playerTop + PLAYER_HEIGHT / 2.0F};
+        if (player_.isFacingRight()) {
+            DrawTriangle(bladeTop, bladeBottom, bladeTip, WHITE);
+        } else {
+            // 左向时交换底边顶点，保持与右向一致的三角形顶点绕序。
+            DrawTriangle(bladeBottom, bladeTop, bladeTip, WHITE);
+        }
+    }
+    for (const Projectile& projectile : projectiles_) {
+        DrawCircle(static_cast<int>(projectile.x), static_cast<int>(projectile.y),
+                   PROJECTILE_RADIUS, ORANGE);
+    }
     if (damageTextElapsedTime_ > 0.0F) {
         DrawText(TextFormat("%.0f", displayedDamage_), static_cast<int>(damageTextX_),
                  static_cast<int>(damageTextY_), 20, YELLOW);
     }
-    DrawText("A/D or arrow keys: move    Space: jump    J: attack", 20, 20, 20,
+    DrawText("A/D or arrow keys: move    Space: jump    J: melee    K: ranged", 20, 20, 20,
              RAYWHITE);
 }

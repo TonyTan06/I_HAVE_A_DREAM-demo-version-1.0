@@ -1,4 +1,5 @@
 #include "player.h"
+#include <algorithm>
 #include <utility>
 #include <iostream>
 #include <cmath>
@@ -9,7 +10,10 @@ Player::Player(std::string name)
       maxJumpCount_(2),
       experience_(1),
       level_(1),
-      gold_(0){
+      gold_(0),
+      isFacingRight_(true),
+      rangedAttackCooldown_(0.0F),
+      rangedAttackRequested_(false) {
         setGravityScale(1.0F);
         setFaction(Faction::Friendly);
         x_ = 140.0F;
@@ -22,10 +26,12 @@ Player::Player(std::string name)
 // 创建了主角，并且可以二连跳
 
 void Player::moveRight(float deltaTime) {
+    isFacingRight_ = true;
     Character::moveRight(deltaTime);
 } //主角右移
 
 void Player::moveLeft(float deltaTime) {
+    isFacingRight_ = false;
     Character::moveLeft(deltaTime);
 } //主角左移
 
@@ -39,6 +45,8 @@ void Player::jump() {
 
 void Player::update(float deltaTime) {
     Character::update(deltaTime);
+
+    rangedAttackCooldown_ = std::max(0.0F, rangedAttackCooldown_ - deltaTime);
 
     if (isGrounded_) jumpCount_ = 0;
 } //主角的状态更新，主角独有的加在这里面
@@ -80,6 +88,23 @@ void Player::attack() {
 
 void Player::attack(Character& target) {
     target.takeDamage(attackDamage_);
+}
+
+void Player::rangedAttack() {
+    if (rangedAttackCooldown_ > 0.0F) return;
+
+    rangedAttackCooldown_ = RANGED_ATTACK_INTERVAL;
+    rangedAttackRequested_ = true;
+}
+
+bool Player::isFacingRight() const {
+    return isFacingRight_;
+}
+
+bool Player::consumeRangedAttackRequest() {
+    const bool wasRequested = rangedAttackRequested_;
+    rangedAttackRequested_ = false;
+    return wasRequested;
 }
 
 int Player::getExperienceThreshold() const{
