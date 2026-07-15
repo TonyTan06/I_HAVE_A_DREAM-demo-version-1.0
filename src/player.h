@@ -19,6 +19,9 @@ public:
     void rangedAttack() override; // 请求一次远程攻击，受自身攻击间隔限制
     bool isFacingRight() const; // 当前朝向，供眼睛与近战攻击判定使用
     bool consumeRangedAttackRequest(); // 供场景读取并清除本帧的子弹生成请求
+    void setDefending(bool shouldDefend); // 按住防御键时尝试进入防御状态
+    bool isDefending() const;
+    bool blockNextAttack(); // 防御判定命中后抵挡一次攻击并开始冷却
 
     int getJumpCount() const; //跳跃次数（可以实现二连跳）
     int getMaxJumpCount() const; //最大跳跃次数
@@ -37,7 +40,10 @@ private:
     bool isFacingRight_; // 最近一次横向移动方向，初始向右
     float rangedAttackCooldown_; // 下次可发射前的剩余冷却时间
     bool rangedAttackRequested_; // 本帧是否需要由场景生成子弹
+    bool isDefending_;
+    float defenseCooldown_;
 
     static constexpr float RANGED_ATTACK_INTERVAL = 0.75F;
+    static constexpr float DEFENSE_COOLDOWN = 2.0F;
 
 };

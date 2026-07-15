@@ -19,7 +19,8 @@ Scene::Scene()
       damageTextX_(0.0F),
       damageTextY_(0.0F),
       displayedDamage_(0.0F),
-      attackEffectElapsedTime_(0.0F) {
+      attackEffectElapsedTime_(0.0F),
+      meleeAttackEffectElapsedTime_(0.0F) {
     rangedEnemy_.setPosition(platform_.x + platform_.width - PLAYER_WIDTH, 0.0F);
     meleeEnemy_.setPosition(rangedEnemy_.getX() - ENEMY_SPACING, 0.0F);
 }
@@ -34,8 +35,9 @@ void Scene::update(float deltaTime) {
     if (IsKeyPressed(KEY_SPACE)) {
         player_.jump();
     }
-    const bool attackPressed = IsKeyPressed(KEY_J);
-    if (IsKeyPressed(KEY_K)) {
+    player_.setDefending(IsKeyDown(KEY_U));
+    const bool attackPressed = IsKeyPressed(KEY_J) && !player_.isDefending();
+    if (IsKeyPressed(KEY_K) && !player_.isDefending()) {
         player_.rangedAttack();
     }
 
@@ -66,6 +68,10 @@ void Scene::update(float deltaTime) {
     if (attackEffectElapsedTime_ > 0.0F) {
         attackEffectElapsedTime_ =
             std::max(0.0F, attackEffectElapsedTime_ - deltaTime);
+    }
+    if (meleeAttackEffectElapsedTime_ > 0.0F) {
+        meleeAttackEffectElapsedTime_ =
+            std::max(0.0F, meleeAttackEffectElapsedTime_ - deltaTime);
     }
     if (attackPressed) {
         attackEffectElapsedTime_ = ATTACK_EFFECT_LIFETIME;
@@ -107,16 +113,28 @@ void Scene::update(float deltaTime) {
         return target;
     };
 
-    if (Character* target = findNearestEnemyTarget(meleeEnemy_); target != nullptr) {
-        const Rectangle meleeAttackHitbox{
-            meleeEnemy_.getX() - ATTACK_RANGE,
-            platform_.y - PLAYER_HEIGHT - meleeEnemy_.getY(),
-            ATTACK_RANGE, PLAYER_HEIGHT};
-        const Rectangle targetHitbox{
-            target->getX(), platform_.y - PLAYER_HEIGHT - target->getY(),
-            PLAYER_WIDTH, PLAYER_HEIGHT};
-        if (CheckCollisionRecs(meleeAttackHitbox, targetHitbox)) {
-            meleeEnemy_.attack(*target);
+    // 近战兵不依赖索敌：只要存活且冷却结束就挥刀；命中范围内的非同阵营目标才受伤。
+    if (meleeEnemy_.tryAttack()) {
+        meleeAttackEffectElapsedTime_ = ATTACK_EFFECT_LIFETIME;
+        Character* target = findNearestEnemyTarget(meleeEnemy_);
+        if (target != nullptr) {
+            const Rectangle meleeAttackHitbox{
+                meleeEnemy_.getX() - ATTACK_RANGE,
+                platform_.y - PLAYER_HEIGHT - meleeEnemy_.getY(),
+                ATTACK_RANGE, PLAYER_HEIGHT};
+            const Rectangle targetHitbox{
+                target->getX(), platform_.y - PLAYER_HEIGHT - target->getY(),
+                PLAYER_WIDTH, PLAYER_HEIGHT};
+            const Rectangle playerDefenseHitbox{
+                player_.isFacingRight() ? player_.getX() + PLAYER_WIDTH
+                                        : player_.getX() - DEFENSE_RANGE,
+                platform_.y - PLAYER_HEIGHT - player_.getY(), DEFENSE_RANGE, PLAYER_HEIGHT};
+            const bool isBlocked = target == &player_ && player_.isDefending() &&
+                CheckCollisionRecs(meleeAttackHitbox, playerDefenseHitbox) &&
+                player_.blockNextAttack();
+            if (CheckCollisionRecs(meleeAttackHitbox, targetHitbox) && !isBlocked) {
+                target->takeDamage(meleeEnemy_.getAttackDamage());
+            }
         }
     }
 
@@ -136,6 +154,10 @@ void Scene::update(float deltaTime) {
         iterator->x += iterator->direction * PROJECTILE_SPEED * deltaTime;
         iterator->travelledDistance += PROJECTILE_SPEED * deltaTime;
         bool hitDamageableTarget = false;
+        const Rectangle playerDefenseHitbox{
+            player_.isFacingRight() ? player_.getX() + PLAYER_WIDTH
+                                    : player_.getX() - DEFENSE_RANGE,
+            platform_.y - PLAYER_HEIGHT - player_.getY(), DEFENSE_RANGE, PLAYER_HEIGHT};
 
         const auto damageTarget = [&](Character& target, const Rectangle& hitbox,
                                       bool& hasBeenHit) {
@@ -144,6 +166,14 @@ void Scene::update(float deltaTime) {
             if (!CheckCollisionCircleRec(
                     Vector2{iterator->x, iterator->y}, PROJECTILE_RADIUS, hitbox)) return;
 
+            if (&target == &player_ && player_.isDefending() &&
+                CheckCollisionCircleRec(Vector2{iterator->x, iterator->y}, PROJECTILE_RADIUS,
+                                        playerDefenseHitbox) &&
+                player_.blockNextAttack()) {
+                hasBeenHit = true;
+                hitDamageableTarget = true;
+                return;
+            }
             target.takeDamage(iterator->damage);
             hasBeenHit = true;
             hitDamageableTarget = true;
@@ -367,21 +397,31 @@ void Scene::draw() const {
         ? player_.getX() + PLAYER_WIDTH - 8.0F
         : player_.getX() + 8.0F;
     DrawCircle(static_cast<int>(eyeX), static_cast<int>(playerTop + 14.0F), 3.0F, BLACK);
-    if (attackEffectElapsedTime_ > 0.0F) {
+    if (player_.isDefending() || attackEffectElapsedTime_ > 0.0F) {
         const float bladeBaseX = player_.isFacingRight()
             ? player_.getX() + PLAYER_WIDTH
             : player_.getX();
         const Vector2 bladeTop{bladeBaseX, playerTop};
         const Vector2 bladeBottom{bladeBaseX, playerTop + PLAYER_HEIGHT};
+        const float bladeLength = player_.isDefending() ? DEFENSE_RANGE : ATTACK_RANGE;
         const Vector2 bladeTip{
-            player_.isFacingRight() ? bladeBaseX + ATTACK_RANGE : bladeBaseX - ATTACK_RANGE,
+            player_.isFacingRight() ? bladeBaseX + bladeLength : bladeBaseX - bladeLength,
             playerTop + PLAYER_HEIGHT / 2.0F};
+        const Color bladeColor = player_.isDefending() ? Color{255, 222, 173, 255} : WHITE;
         if (player_.isFacingRight()) {
-            DrawTriangle(bladeTop, bladeBottom, bladeTip, WHITE);
+            DrawTriangle(bladeTop, bladeBottom, bladeTip, bladeColor);
         } else {
             // 左向时交换底边顶点，保持与右向一致的三角形顶点绕序。
-            DrawTriangle(bladeBottom, bladeTop, bladeTip, WHITE);
+            DrawTriangle(bladeBottom, bladeTop, bladeTip, bladeColor);
         }
+    }
+    if (meleeAttackEffectElapsedTime_ > 0.0F) {
+        const float enemyTop = platform_.y - PLAYER_HEIGHT - meleeEnemy_.getY();
+        const float bladeBaseX = meleeEnemy_.getX();
+        const Vector2 bladeTop{bladeBaseX, enemyTop};
+        const Vector2 bladeBottom{bladeBaseX, enemyTop + PLAYER_HEIGHT};
+        const Vector2 bladeTip{bladeBaseX - ATTACK_RANGE, enemyTop + PLAYER_HEIGHT / 2.0F};
+        DrawTriangle(bladeBottom, bladeTop, bladeTip, Color{255, 182, 193, 255});
     }
     for (const Projectile& projectile : projectiles_) {
         DrawCircle(static_cast<int>(projectile.x), static_cast<int>(projectile.y),
@@ -394,6 +434,6 @@ void Scene::draw() const {
         DrawText(TextFormat("%.0f", displayedDamage_), static_cast<int>(damageTextX_),
                  static_cast<int>(damageTextY_), 20, YELLOW);
     }
-    DrawText("A/D or arrow keys: move    Space: jump    J: melee    K: ranged", 20, 20, 20,
+    DrawText("A/D or arrow keys: move    Space: jump    J: melee    K: ranged    U: defend", 20, 20, 20,
              RAYWHITE);
 }

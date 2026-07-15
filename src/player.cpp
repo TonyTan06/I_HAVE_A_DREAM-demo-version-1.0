@@ -13,7 +13,9 @@ Player::Player(std::string name)
       gold_(0),
       isFacingRight_(true),
       rangedAttackCooldown_(0.0F),
-      rangedAttackRequested_(false) {
+      rangedAttackRequested_(false),
+      isDefending_(false),
+      defenseCooldown_(0.0F) {
         setGravityScale(1.0F);
         setFaction(Faction::Friendly);
         x_ = 140.0F;
@@ -47,6 +49,10 @@ void Player::update(float deltaTime) {
     Character::update(deltaTime);
 
     rangedAttackCooldown_ = std::max(0.0F, rangedAttackCooldown_ - deltaTime);
+    defenseCooldown_ = std::max(0.0F, defenseCooldown_ - deltaTime);
+    if (defenseCooldown_ > 0.0F) {
+        isDefending_ = false;
+    }
 
     if (isGrounded_) jumpCount_ = 0;
 } //主角的状态更新，主角独有的加在这里面
@@ -91,6 +97,7 @@ void Player::attack(Character& target) {
 }
 
 void Player::rangedAttack() {
+    if (isDefending_) return;
     if (rangedAttackCooldown_ > 0.0F) return;
 
     rangedAttackCooldown_ = RANGED_ATTACK_INTERVAL;
@@ -105,6 +112,25 @@ bool Player::consumeRangedAttackRequest() {
     const bool wasRequested = rangedAttackRequested_;
     rangedAttackRequested_ = false;
     return wasRequested;
+}
+
+void Player::setDefending(bool shouldDefend) {
+    isDefending_ = shouldDefend && defenseCooldown_ <= 0.0F;
+    if (isDefending_) {
+        rangedAttackRequested_ = false;
+    }
+}
+
+bool Player::isDefending() const {
+    return isDefending_;
+}
+
+bool Player::blockNextAttack() {
+    if (!isDefending_) return false;
+
+    isDefending_ = false;
+    defenseCooldown_ = DEFENSE_COOLDOWN;
+    return true;
 }
 
 int Player::getExperienceThreshold() const{

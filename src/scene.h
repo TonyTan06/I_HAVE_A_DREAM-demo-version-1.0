@@ -51,6 +51,7 @@ private:
     float damageTextY_;
     float displayedDamage_;
     float attackEffectElapsedTime_;
+    float meleeAttackEffectElapsedTime_;
     std::vector<Projectile> projectiles_;
 
     static constexpr float PLAYER_WIDTH = 32.0F;
@@ -60,6 +61,7 @@ private:
     static constexpr float DAMAGE_TEXT_LIFETIME = 1.0F;
     static constexpr float ATTACK_EFFECT_LIFETIME = 0.15F;
     static constexpr float ATTACK_RANGE = 16.0F;
+    static constexpr float DEFENSE_RANGE = 8.0F;
     static constexpr float PROJECTILE_RADIUS = 4.0F;
     static constexpr float PROJECTILE_SPEED = 300.0F;
     static constexpr float PROJECTILE_MAX_DISTANCE = 500.0F;

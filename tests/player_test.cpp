@@ -49,6 +49,29 @@ TEST(PlayerTest, LimitsRangedAttackToOneShotEveryThreeQuartersOfASecond) {
     EXPECT_TRUE(player.consumeRangedAttackRequest());
 }
 
+TEST(PlayerTest, BlocksOneAttackThenHasTwoSecondCooldown) {
+    Player player("Johnny");
+    player.setDefending(true);
+
+    EXPECT_TRUE(player.isDefending());
+    EXPECT_TRUE(player.blockNextAttack());
+    EXPECT_FALSE(player.isDefending());
+
+    player.setDefending(true);
+    EXPECT_FALSE(player.isDefending());
+    player.update(2.0F);
+    player.setDefending(true);
+    EXPECT_TRUE(player.isDefending());
+}
+
+TEST(PlayerTest, DefensePreventsRangedAttackRequest) {
+    Player player("Johnny");
+    player.setDefending(true);
+    player.rangedAttack();
+
+    EXPECT_FALSE(player.consumeRangedAttackRequest());
+}
+
 TEST(PlayerTest, AddsOnlyPositiveGold) {
     Player player("Johnny");
 
