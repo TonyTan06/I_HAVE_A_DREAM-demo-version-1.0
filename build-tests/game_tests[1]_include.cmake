@@ -1,5 +1,0 @@
-if(EXISTS "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests[1]_tests.cmake")
-  include("/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests[1]_tests.cmake")
-else()
-  add_test(game_tests_NOT_BUILT game_tests_NOT_BUILT)
-endif()
