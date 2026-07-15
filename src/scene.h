@@ -1,7 +1,9 @@
 #pragma once
 
+#include "melee_enemy.h"
 #include "player.h"
 #include "player_shadow.h"
+#include "ranged_enemy.h"
 #include "raylib.h"
 
 #include <optional>
@@ -20,9 +22,19 @@ private:
         float y;
         float direction;
         float travelledDistance;
+        float damage;
+        Faction faction;
+        bool hitPlayer;
+        bool hitShadow;
+        bool hitMeleeEnemy;
+        bool hitRangedEnemy;
     };
 
     Player player_;
+    MeleeEnemy meleeEnemy_;
+    RangedEnemy rangedEnemy_;
+    float playerSpawnX_;
+    float playerSpawnY_;
     // 同时最多保留一个影子；空值表示正等待玩家横向移动满 300px。
     std::optional<PlayerShadow> playerShadow_;
     Rectangle platform_;
@@ -51,4 +63,6 @@ private:
     static constexpr float PROJECTILE_RADIUS = 4.0F;
     static constexpr float PROJECTILE_SPEED = 300.0F;
     static constexpr float PROJECTILE_MAX_DISTANCE = 500.0F;
+    static constexpr float ENEMY_SPACING = 100.0F;
+    static constexpr float ENEMY_DETECTION_RANGE = 300.0F;
 };

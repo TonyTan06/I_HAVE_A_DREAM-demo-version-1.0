@@ -15,6 +15,16 @@ TEST(PlayerTest, StartsAtLevelOneWithNoGold) {
     EXPECT_TRUE(player.isFacingRight());
 }
 
+TEST(PlayerTest, CanRecoverToFullHealthAfterDeath) {
+    Player player("Johnny");
+
+    player.takeDamage(player.getMaxHealth());
+    player.heal(player.getMaxHealth());
+
+    EXPECT_TRUE(player.isAlive());
+    EXPECT_FLOAT_EQ(player.getHealth(), player.getMaxHealth());
+}
+
 TEST(PlayerTest, FacesTheDirectionOfItsLastHorizontalMovement) {
     Player player("Johnny");
 
