@@ -8,6 +8,10 @@ TEST(PlayerTest, StartsAtLevelOneWithNoGold) {
     EXPECT_EQ(player.getLevel(), 1);
     EXPECT_EQ(player.getGold(), 0);
     EXPECT_EQ(player.getMaxJumpCount(), 2);
+    EXPECT_FLOAT_EQ(player.getHealth(), 10.0F);
+    EXPECT_FLOAT_EQ(player.getMaxHealth(), 10.0F);
+    EXPECT_FLOAT_EQ(player.getAttackDamage(), 5.0F);
+    EXPECT_EQ(player.getFaction(), Faction::Friendly);
 }
 
 TEST(PlayerTest, AddsOnlyPositiveGold) {

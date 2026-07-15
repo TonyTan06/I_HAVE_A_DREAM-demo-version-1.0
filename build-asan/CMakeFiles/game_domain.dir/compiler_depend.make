@@ -666,7 +666,6 @@ CMakeFiles/game_domain.dir/src/character.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ D
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdarg.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdint.h \
-  /Library/Developer/CommandLineTools/usr/lib/clang/21/share/asan_ignorelist.txt \
   /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/character.h
 
 CMakeFiles/game_domain.dir/src/enemy.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/enemy.cpp \
@@ -1533,7 +1532,6 @@ CMakeFiles/game_domain.dir/src/enemy.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREAM
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdarg.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdint.h \
-  /Library/Developer/CommandLineTools/usr/lib/clang/21/share/asan_ignorelist.txt \
   /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/character.h \
   /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/enemy.h
 
@@ -2202,7 +2200,6 @@ CMakeFiles/game_domain.dir/src/item.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREAM/
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdarg.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdint.h \
-  /Library/Developer/CommandLineTools/usr/lib/clang/21/share/asan_ignorelist.txt \
   /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/item.h
 
 CMakeFiles/game_domain.dir/src/player.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player.cpp \
@@ -3017,7 +3014,6 @@ CMakeFiles/game_domain.dir/src/player.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREA
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdarg.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdint.h \
-  /Library/Developer/CommandLineTools/usr/lib/clang/21/share/asan_ignorelist.txt \
   /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/character.h \
   /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player.h
 
@@ -3099,6 +3095,8 @@ CMakeFiles/game_domain.dir/src/player.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREA
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/mutex:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/locale:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/iostream:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/format:
 
@@ -3252,6 +3250,8 @@ CMakeFiles/game_domain.dir/src/player.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREA
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/bind.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/traits.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/to_chars_result.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/to_chars_integral.h:
@@ -3270,13 +3270,13 @@ CMakeFiles/game_domain.dir/src/player.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREA
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_locale_posix2008.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/traits.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/iostream:
-
-/Library/Developer/CommandLineTools/usr/lib/clang/21/share/asan_ignorelist.txt:
-
 /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdint.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_mbstate_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/array.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/no_destroy.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__new/launder.h:
 
@@ -4159,12 +4159,6 @@ CMakeFiles/game_domain.dir/src/player.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREA
 /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stddef.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/complex.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/no_destroy.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_mbstate_t.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/array.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/construct_at.h:
 

@@ -1,0 +1,1 @@
+/usr/bin/c++  -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/game_tests.dir/tests/character_test.cpp.o CMakeFiles/game_tests.dir/tests/enemy_test.cpp.o CMakeFiles/game_tests.dir/tests/item_test.cpp.o CMakeFiles/game_tests.dir/tests/player_test.cpp.o -o game_tests  libgame_domain.a lib/libgtest_main.a lib/libgtest.a

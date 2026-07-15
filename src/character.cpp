@@ -17,7 +17,8 @@ Character::Character(std::string name)
       jumpInitialVelocity_(0.0F),
       verticalVelocity_(0.0F),
       gravityScale_(1.0F),
-      isGrounded_(true)
+      isGrounded_(true),
+      faction_(Faction::Neutral)
 {
 } //输入角色名字就创建了，里面包含基础属性，具体数值不在这里调整，这只是通用配置。
 
@@ -57,6 +58,73 @@ void Character::attack() {
 bool Character::isAlive() const {
     return health_ > 0.0F;
 } //检测存活
+
+bool Character::isGrounded() const {
+    return isGrounded_;
+}
+
+float Character::getHealth() const {
+    return health_;
+}
+
+float Character::getX() const {
+    return x_;
+}
+
+float Character::getY() const {
+    return y_;
+}
+
+void Character::setPosition(float x, float y) {
+    x_ = x;
+    y_ = y;
+}
+
+void Character::land() {
+    y_ = 0.0F;
+    verticalVelocity_ = 0.0F;
+    isGrounded_ = true;
+}
+
+float Character::getMoveSpeed() const {
+    return moveSpeed_;
+}
+
+float Character::getPhysicalDefense() const {
+    return physicalDefense_;
+}
+
+float Character::getMagicalDefense() const {
+    return magicalDefense_;
+}
+
+float Character::getMaxHealth() const {
+    return maxHealth_;
+}
+
+float Character::getAttackDamage() const {
+    return attackDamage_;
+}
+
+float Character::getAttacksPerSecond() const {
+    return attacksPerSecond_;
+}
+
+float Character::getShield() const {
+    return shield_;
+}
+
+float Character::getJumpInitialVelocity() const {
+    return jumpInitialVelocity_;
+}
+
+Faction Character::getFaction() const {
+    return faction_;
+}
+
+void Character::setFaction(Faction faction) {
+    faction_ = faction;
+}
 
 float Character::getGravityScale() const {
     return gravityScale_;

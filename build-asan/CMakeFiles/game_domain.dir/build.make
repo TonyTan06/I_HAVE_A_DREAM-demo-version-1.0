@@ -100,10 +100,24 @@ CMakeFiles/game_domain.dir/src/player.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/game_domain.dir/src/player.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player.cpp" -o CMakeFiles/game_domain.dir/src/player.cpp.s
 
+CMakeFiles/game_domain.dir/src/player_shadow.cpp.o: CMakeFiles/game_domain.dir/flags.make
+CMakeFiles/game_domain.dir/src/player_shadow.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player_shadow.cpp
+CMakeFiles/game_domain.dir/src/player_shadow.cpp.o: CMakeFiles/game_domain.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-asan/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/game_domain.dir/src/player_shadow.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/game_domain.dir/src/player_shadow.cpp.o -MF CMakeFiles/game_domain.dir/src/player_shadow.cpp.o.d -o CMakeFiles/game_domain.dir/src/player_shadow.cpp.o -c "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player_shadow.cpp"
+
+CMakeFiles/game_domain.dir/src/player_shadow.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/game_domain.dir/src/player_shadow.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player_shadow.cpp" > CMakeFiles/game_domain.dir/src/player_shadow.cpp.i
+
+CMakeFiles/game_domain.dir/src/player_shadow.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/game_domain.dir/src/player_shadow.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player_shadow.cpp" -o CMakeFiles/game_domain.dir/src/player_shadow.cpp.s
+
 CMakeFiles/game_domain.dir/src/enemy.cpp.o: CMakeFiles/game_domain.dir/flags.make
 CMakeFiles/game_domain.dir/src/enemy.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/enemy.cpp
 CMakeFiles/game_domain.dir/src/enemy.cpp.o: CMakeFiles/game_domain.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-asan/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/game_domain.dir/src/enemy.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-asan/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/game_domain.dir/src/enemy.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/game_domain.dir/src/enemy.cpp.o -MF CMakeFiles/game_domain.dir/src/enemy.cpp.o.d -o CMakeFiles/game_domain.dir/src/enemy.cpp.o -c "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/enemy.cpp"
 
 CMakeFiles/game_domain.dir/src/enemy.cpp.i: cmake_force
@@ -117,7 +131,7 @@ CMakeFiles/game_domain.dir/src/enemy.cpp.s: cmake_force
 CMakeFiles/game_domain.dir/src/item.cpp.o: CMakeFiles/game_domain.dir/flags.make
 CMakeFiles/game_domain.dir/src/item.cpp.o: /Users/tan/Desktop/I\ HAVE\ A\ DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/item.cpp
 CMakeFiles/game_domain.dir/src/item.cpp.o: CMakeFiles/game_domain.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-asan/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/game_domain.dir/src/item.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-asan/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/game_domain.dir/src/item.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/game_domain.dir/src/item.cpp.o -MF CMakeFiles/game_domain.dir/src/item.cpp.o.d -o CMakeFiles/game_domain.dir/src/item.cpp.o -c "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/item.cpp"
 
 CMakeFiles/game_domain.dir/src/item.cpp.i: cmake_force
@@ -132,6 +146,7 @@ CMakeFiles/game_domain.dir/src/item.cpp.s: cmake_force
 game_domain_OBJECTS = \
 "CMakeFiles/game_domain.dir/src/character.cpp.o" \
 "CMakeFiles/game_domain.dir/src/player.cpp.o" \
+"CMakeFiles/game_domain.dir/src/player_shadow.cpp.o" \
 "CMakeFiles/game_domain.dir/src/enemy.cpp.o" \
 "CMakeFiles/game_domain.dir/src/item.cpp.o"
 
@@ -140,11 +155,12 @@ game_domain_EXTERNAL_OBJECTS =
 
 libgame_domain.a: CMakeFiles/game_domain.dir/src/character.cpp.o
 libgame_domain.a: CMakeFiles/game_domain.dir/src/player.cpp.o
+libgame_domain.a: CMakeFiles/game_domain.dir/src/player_shadow.cpp.o
 libgame_domain.a: CMakeFiles/game_domain.dir/src/enemy.cpp.o
 libgame_domain.a: CMakeFiles/game_domain.dir/src/item.cpp.o
 libgame_domain.a: CMakeFiles/game_domain.dir/build.make
 libgame_domain.a: CMakeFiles/game_domain.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-asan/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX static library libgame_domain.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-asan/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX static library libgame_domain.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/game_domain.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/game_domain.dir/link.txt --verbose=$(VERBOSE)
 

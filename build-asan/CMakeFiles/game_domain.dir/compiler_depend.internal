@@ -667,7 +667,6 @@ CMakeFiles/game_domain.dir/src/character.cpp.o
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdarg.h
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stddef.h
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdint.h
- /Library/Developer/CommandLineTools/usr/lib/clang/21/share/asan_ignorelist.txt
  /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/character.h
 
 CMakeFiles/game_domain.dir/src/enemy.cpp.o
@@ -1535,7 +1534,6 @@ CMakeFiles/game_domain.dir/src/enemy.cpp.o
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdarg.h
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stddef.h
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdint.h
- /Library/Developer/CommandLineTools/usr/lib/clang/21/share/asan_ignorelist.txt
  /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/character.h
  /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/enemy.h
 
@@ -2205,7 +2203,6 @@ CMakeFiles/game_domain.dir/src/item.cpp.o
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdarg.h
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stddef.h
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdint.h
- /Library/Developer/CommandLineTools/usr/lib/clang/21/share/asan_ignorelist.txt
  /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/item.h
 
 CMakeFiles/game_domain.dir/src/player.cpp.o
@@ -3021,7 +3018,6 @@ CMakeFiles/game_domain.dir/src/player.cpp.o
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdarg.h
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stddef.h
  /Library/Developer/CommandLineTools/usr/lib/clang/21/include/stdint.h
- /Library/Developer/CommandLineTools/usr/lib/clang/21/share/asan_ignorelist.txt
  /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/character.h
  /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player.h
 

@@ -1,23 +1,17 @@
-#include "player.h"
-#include "enemy.h"
-#include "item.h"
-#include "character.h"
+#include "scene.h"
 #include "raylib.h"
 
-#include <iostream>
-#include <string>
-
 int main() {
-    Player player ("PLAYER");
-
-    
     InitWindow(800, 450, "I HAVE A DREAM");
     SetTargetFPS(60);
 
+    Scene scene;
+
     while (!WindowShouldClose()) {
+        scene.update(GetFrameTime());
+
         BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawText("Hello raylib!", 280, 200, 30, BLACK);
+        scene.draw();
         EndDrawing();
     }
 

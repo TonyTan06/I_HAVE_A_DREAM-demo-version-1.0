@@ -7,6 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/game_domain.dir/src/item.cpp.o.d"
   "CMakeFiles/game_domain.dir/src/player.cpp.o"
   "CMakeFiles/game_domain.dir/src/player.cpp.o.d"
+  "CMakeFiles/game_domain.dir/src/player_shadow.cpp.o"
+  "CMakeFiles/game_domain.dir/src/player_shadow.cpp.o.d"
   "libgame_domain.a"
   "libgame_domain.pdb"
 )

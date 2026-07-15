@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/enemy.cpp" "CMakeFiles/game_domain.dir/src/enemy.cpp.o" "gcc" "CMakeFiles/game_domain.dir/src/enemy.cpp.o.d"
   "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/item.cpp" "CMakeFiles/game_domain.dir/src/item.cpp.o" "gcc" "CMakeFiles/game_domain.dir/src/item.cpp.o.d"
   "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player.cpp" "CMakeFiles/game_domain.dir/src/player.cpp.o" "gcc" "CMakeFiles/game_domain.dir/src/player.cpp.o.d"
+  "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src/player_shadow.cpp" "CMakeFiles/game_domain.dir/src/player_shadow.cpp.o" "gcc" "CMakeFiles/game_domain.dir/src/player_shadow.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

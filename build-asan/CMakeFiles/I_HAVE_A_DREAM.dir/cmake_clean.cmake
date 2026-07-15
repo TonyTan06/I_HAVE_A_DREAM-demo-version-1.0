@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/I_HAVE_A_DREAM.dir/src/main.cpp.o"
   "CMakeFiles/I_HAVE_A_DREAM.dir/src/main.cpp.o.d"
+  "CMakeFiles/I_HAVE_A_DREAM.dir/src/scene.cpp.o"
+  "CMakeFiles/I_HAVE_A_DREAM.dir/src/scene.cpp.o.d"
   "I_HAVE_A_DREAM"
   "I_HAVE_A_DREAM.pdb"
 )

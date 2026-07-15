@@ -14,6 +14,7 @@ Enemy::Enemy(std::string name)
       timeSinceLastAttack_(0.0F) //自上次攻击以来的时间
 {
     setGravityScale(1.0F);
+    setFaction(Faction::Enemy);
 }
 
 std::vector<LootItem> Enemy::dropLoot() {

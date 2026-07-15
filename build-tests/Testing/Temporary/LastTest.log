@@ -1,0 +1,317 @@
+Start testing: Jul 13 11:39 CST
+----------------------------------------------------------
+1/12 Testing: CharacterTest.StartsAliveAndUsesDefaultGravityScale
+1/12 Test: CharacterTest.StartsAliveAndUsesDefaultGravityScale
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=CharacterTest.StartsAliveAndUsesDefaultGravityScale" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"CharacterTest.StartsAliveAndUsesDefaultGravityScale" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = CharacterTest.StartsAliveAndUsesDefaultGravityScale
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from CharacterTest
+[ RUN      ] CharacterTest.StartsAliveAndUsesDefaultGravityScale
+[       OK ] CharacterTest.StartsAliveAndUsesDefaultGravityScale (0 ms)
+[----------] 1 test from CharacterTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"CharacterTest.StartsAliveAndUsesDefaultGravityScale" end time: Jul 13 11:39 CST
+"CharacterTest.StartsAliveAndUsesDefaultGravityScale" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/12 Testing: CharacterTest.RejectsNegativeGravityScale
+2/12 Test: CharacterTest.RejectsNegativeGravityScale
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=CharacterTest.RejectsNegativeGravityScale" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"CharacterTest.RejectsNegativeGravityScale" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = CharacterTest.RejectsNegativeGravityScale
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from CharacterTest
+[ RUN      ] CharacterTest.RejectsNegativeGravityScale
+[       OK ] CharacterTest.RejectsNegativeGravityScale (0 ms)
+[----------] 1 test from CharacterTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"CharacterTest.RejectsNegativeGravityScale" end time: Jul 13 11:39 CST
+"CharacterTest.RejectsNegativeGravityScale" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/12 Testing: EnemyTest.StartsAliveAndHasNoLootByDefault
+3/12 Test: EnemyTest.StartsAliveAndHasNoLootByDefault
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=EnemyTest.StartsAliveAndHasNoLootByDefault" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"EnemyTest.StartsAliveAndHasNoLootByDefault" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = EnemyTest.StartsAliveAndHasNoLootByDefault
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from EnemyTest
+[ RUN      ] EnemyTest.StartsAliveAndHasNoLootByDefault
+[       OK ] EnemyTest.StartsAliveAndHasNoLootByDefault (0 ms)
+[----------] 1 test from EnemyTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"EnemyTest.StartsAliveAndHasNoLootByDefault" end time: Jul 13 11:39 CST
+"EnemyTest.StartsAliveAndHasNoLootByDefault" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/12 Testing: ItemTest.StoresNameRarityAndBasePrice
+4/12 Test: ItemTest.StoresNameRarityAndBasePrice
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=ItemTest.StoresNameRarityAndBasePrice" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"ItemTest.StoresNameRarityAndBasePrice" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ItemTest.StoresNameRarityAndBasePrice
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ItemTest
+[ RUN      ] ItemTest.StoresNameRarityAndBasePrice
+[       OK ] ItemTest.StoresNameRarityAndBasePrice (0 ms)
+[----------] 1 test from ItemTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ItemTest.StoresNameRarityAndBasePrice" end time: Jul 13 11:39 CST
+"ItemTest.StoresNameRarityAndBasePrice" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/12 Testing: ItemTest.ReturnsCorrectRarityName
+5/12 Test: ItemTest.ReturnsCorrectRarityName
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=ItemTest.ReturnsCorrectRarityName" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"ItemTest.ReturnsCorrectRarityName" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ItemTest.ReturnsCorrectRarityName
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ItemTest
+[ RUN      ] ItemTest.ReturnsCorrectRarityName
+[       OK ] ItemTest.ReturnsCorrectRarityName (0 ms)
+[----------] 1 test from ItemTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ItemTest.ReturnsCorrectRarityName" end time: Jul 13 11:39 CST
+"ItemTest.ReturnsCorrectRarityName" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/12 Testing: ItemTest.CalculatesSellPriceUsingRarityMultiplier
+6/12 Test: ItemTest.CalculatesSellPriceUsingRarityMultiplier
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=ItemTest.CalculatesSellPriceUsingRarityMultiplier" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"ItemTest.CalculatesSellPriceUsingRarityMultiplier" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ItemTest.CalculatesSellPriceUsingRarityMultiplier
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ItemTest
+[ RUN      ] ItemTest.CalculatesSellPriceUsingRarityMultiplier
+[       OK ] ItemTest.CalculatesSellPriceUsingRarityMultiplier (0 ms)
+[----------] 1 test from ItemTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ItemTest.CalculatesSellPriceUsingRarityMultiplier" end time: Jul 13 11:39 CST
+"ItemTest.CalculatesSellPriceUsingRarityMultiplier" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/12 Testing: ItemTest.NegativeBasePriceBecomesZero
+7/12 Test: ItemTest.NegativeBasePriceBecomesZero
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=ItemTest.NegativeBasePriceBecomesZero" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"ItemTest.NegativeBasePriceBecomesZero" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ItemTest.NegativeBasePriceBecomesZero
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ItemTest
+[ RUN      ] ItemTest.NegativeBasePriceBecomesZero
+[       OK ] ItemTest.NegativeBasePriceBecomesZero (0 ms)
+[----------] 1 test from ItemTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ItemTest.NegativeBasePriceBecomesZero" end time: Jul 13 11:39 CST
+"ItemTest.NegativeBasePriceBecomesZero" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/12 Testing: PlayerTest.StartsAtLevelOneWithNoGold
+8/12 Test: PlayerTest.StartsAtLevelOneWithNoGold
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=PlayerTest.StartsAtLevelOneWithNoGold" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"PlayerTest.StartsAtLevelOneWithNoGold" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PlayerTest.StartsAtLevelOneWithNoGold
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PlayerTest
+[ RUN      ] PlayerTest.StartsAtLevelOneWithNoGold
+[       OK ] PlayerTest.StartsAtLevelOneWithNoGold (0 ms)
+[----------] 1 test from PlayerTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"PlayerTest.StartsAtLevelOneWithNoGold" end time: Jul 13 11:39 CST
+"PlayerTest.StartsAtLevelOneWithNoGold" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/12 Testing: PlayerTest.AddsOnlyPositiveGold
+9/12 Test: PlayerTest.AddsOnlyPositiveGold
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=PlayerTest.AddsOnlyPositiveGold" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"PlayerTest.AddsOnlyPositiveGold" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PlayerTest.AddsOnlyPositiveGold
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PlayerTest
+[ RUN      ] PlayerTest.AddsOnlyPositiveGold
+[       OK ] PlayerTest.AddsOnlyPositiveGold (0 ms)
+[----------] 1 test from PlayerTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"PlayerTest.AddsOnlyPositiveGold" end time: Jul 13 11:39 CST
+"PlayerTest.AddsOnlyPositiveGold" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/12 Testing: PlayerTest.CannotJumpMoreThanItsMaximumCount
+10/12 Test: PlayerTest.CannotJumpMoreThanItsMaximumCount
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=PlayerTest.CannotJumpMoreThanItsMaximumCount" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"PlayerTest.CannotJumpMoreThanItsMaximumCount" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PlayerTest.CannotJumpMoreThanItsMaximumCount
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PlayerTest
+[ RUN      ] PlayerTest.CannotJumpMoreThanItsMaximumCount
+[       OK ] PlayerTest.CannotJumpMoreThanItsMaximumCount (0 ms)
+[----------] 1 test from PlayerTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"PlayerTest.CannotJumpMoreThanItsMaximumCount" end time: Jul 13 11:39 CST
+"PlayerTest.CannotJumpMoreThanItsMaximumCount" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/12 Testing: PlayerTest.LevelsUpWhenExperienceReachesThreshold
+11/12 Test: PlayerTest.LevelsUpWhenExperienceReachesThreshold
+Command: "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/game_tests" "--gtest_filter=PlayerTest.LevelsUpWhenExperienceReachesThreshold" "--gtest_also_run_disabled_tests"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"PlayerTest.LevelsUpWhenExperienceReachesThreshold" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Running main() from /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PlayerTest.LevelsUpWhenExperienceReachesThreshold
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PlayerTest
+[ RUN      ] PlayerTest.LevelsUpWhenExperienceReachesThreshold
+LEVEL UP!
+[       OK ] PlayerTest.LevelsUpWhenExperienceReachesThreshold (0 ms)
+[----------] 1 test from PlayerTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"PlayerTest.LevelsUpWhenExperienceReachesThreshold" end time: Jul 13 11:39 CST
+"PlayerTest.LevelsUpWhenExperienceReachesThreshold" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/12 Testing: test_file_coverage
+12/12 Test: test_file_coverage
+Command: "/usr/local/Frameworks/Python.framework/Versions/3.12/bin/python3.12" "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/scripts/check_test_coverage.py" "--src-dir" "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src" "--tests-dir" "/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/tests" "--exclude" "main.cpp"
+Directory: /Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/build-tests
+"test_file_coverage" start time: Jul 13 11:39 CST
+Output:
+----------------------------------------------------------
+Test-file coverage passed: 4 source files checked.
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"test_file_coverage" end time: Jul 13 11:39 CST
+"test_file_coverage" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jul 13 11:39 CST

@@ -1,0 +1,13 @@
+CharacterTest.StartsAliveAndUsesDefaultGravityScale 1 0.0385395
+CharacterTest.RejectsNegativeGravityScale 1 0.0384813
+EnemyTest.StartsAliveAndHasNoLootByDefault 1 0.0379787
+ItemTest.StoresNameRarityAndBasePrice 1 0.0402202
+ItemTest.ReturnsCorrectRarityName 1 0.0393295
+ItemTest.CalculatesSellPriceUsingRarityMultiplier 1 0.0372733
+ItemTest.NegativeBasePriceBecomesZero 1 0.0407313
+PlayerTest.StartsAtLevelOneWithNoGold 1 0.0403765
+PlayerTest.AddsOnlyPositiveGold 1 0.0399323
+PlayerTest.CannotJumpMoreThanItsMaximumCount 1 0.040557
+PlayerTest.LevelsUpWhenExperienceReachesThreshold 1 0.0387672
+test_file_coverage 1 0.153515
+---

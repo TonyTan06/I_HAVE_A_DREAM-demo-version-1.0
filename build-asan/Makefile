@@ -208,19 +208,6 @@ I_HAVE_A_DREAM/fast:
 .PHONY : I_HAVE_A_DREAM/fast
 
 #=============================================================================
-# Target rules for targets named uninstall
-
-# Build rule for target.
-uninstall: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 uninstall
-.PHONY : uninstall
-
-# fast build rule for target.
-uninstall/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/CMakeFiles/uninstall.dir/build.make _deps/raylib-build/CMakeFiles/uninstall.dir/build
-.PHONY : uninstall/fast
-
-#=============================================================================
 # Target rules for targets named raylib
 
 # Build rule for target.
@@ -230,7 +217,7 @@ raylib: cmake_check_build_system
 
 # fast build rule for target.
 raylib/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/CMakeFiles/raylib.dir/build.make _deps/raylib-build/raylib/CMakeFiles/raylib.dir/build
+	$(MAKE) $(MAKESILENT) -f third_party/raylib/raylib/CMakeFiles/raylib.dir/build.make third_party/raylib/raylib/CMakeFiles/raylib.dir/build
 .PHONY : raylib/fast
 
 #=============================================================================
@@ -243,7 +230,7 @@ glfw: cmake_check_build_system
 
 # fast build rule for target.
 glfw/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/build
+	$(MAKE) $(MAKESILENT) -f third_party/raylib/raylib/external/glfw/src/CMakeFiles/glfw.dir/build.make third_party/raylib/raylib/external/glfw/src/CMakeFiles/glfw.dir/build
 .PHONY : glfw/fast
 
 #=============================================================================
@@ -256,7 +243,7 @@ update_mappings: cmake_check_build_system
 
 # fast build rule for target.
 update_mappings/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
+	$(MAKE) $(MAKESILENT) -f third_party/raylib/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build.make third_party/raylib/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
 .PHONY : update_mappings/fast
 
 src/character.o: src/character.cpp.o
@@ -379,6 +366,54 @@ src/player.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_domain.dir/build.make CMakeFiles/game_domain.dir/src/player.cpp.s
 .PHONY : src/player.cpp.s
 
+src/player_shadow.o: src/player_shadow.cpp.o
+.PHONY : src/player_shadow.o
+
+# target to build an object file
+src/player_shadow.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_domain.dir/build.make CMakeFiles/game_domain.dir/src/player_shadow.cpp.o
+.PHONY : src/player_shadow.cpp.o
+
+src/player_shadow.i: src/player_shadow.cpp.i
+.PHONY : src/player_shadow.i
+
+# target to preprocess a source file
+src/player_shadow.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_domain.dir/build.make CMakeFiles/game_domain.dir/src/player_shadow.cpp.i
+.PHONY : src/player_shadow.cpp.i
+
+src/player_shadow.s: src/player_shadow.cpp.s
+.PHONY : src/player_shadow.s
+
+# target to generate assembly for a file
+src/player_shadow.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_domain.dir/build.make CMakeFiles/game_domain.dir/src/player_shadow.cpp.s
+.PHONY : src/player_shadow.cpp.s
+
+src/scene.o: src/scene.cpp.o
+.PHONY : src/scene.o
+
+# target to build an object file
+src/scene.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/I_HAVE_A_DREAM.dir/build.make CMakeFiles/I_HAVE_A_DREAM.dir/src/scene.cpp.o
+.PHONY : src/scene.cpp.o
+
+src/scene.i: src/scene.cpp.i
+.PHONY : src/scene.i
+
+# target to preprocess a source file
+src/scene.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/I_HAVE_A_DREAM.dir/build.make CMakeFiles/I_HAVE_A_DREAM.dir/src/scene.cpp.i
+.PHONY : src/scene.cpp.i
+
+src/scene.s: src/scene.cpp.s
+.PHONY : src/scene.s
+
+# target to generate assembly for a file
+src/scene.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/I_HAVE_A_DREAM.dir/build.make CMakeFiles/I_HAVE_A_DREAM.dir/src/scene.cpp.s
+.PHONY : src/scene.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -393,7 +428,6 @@ help:
 	@echo "... package"
 	@echo "... package_source"
 	@echo "... rebuild_cache"
-	@echo "... uninstall"
 	@echo "... update_mappings"
 	@echo "... I_HAVE_A_DREAM"
 	@echo "... game_domain"
@@ -414,6 +448,12 @@ help:
 	@echo "... src/player.o"
 	@echo "... src/player.i"
 	@echo "... src/player.s"
+	@echo "... src/player_shadow.o"
+	@echo "... src/player_shadow.i"
+	@echo "... src/player_shadow.s"
+	@echo "... src/scene.o"
+	@echo "... src/scene.i"
+	@echo "... src/scene.s"
 .PHONY : help
 
 

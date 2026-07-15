@@ -6,7 +6,7 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I"/Users/tan/Desktop/I HAVE A DREAM/I_HAVE_A_DREAM-demo-version-1.0/src"
 
-CXX_FLAGSx86_64 = -g -std=c++17 -arch x86_64 -Wall -Wextra -Wpedantic -Werror -fsanitize=address,undefined -fno-omit-frame-pointer
+CXX_FLAGSx86_64 = -g -std=c++17 -arch x86_64 -Wall -Wextra -Wpedantic -Werror
 
-CXX_FLAGS = -g -std=c++17 -arch x86_64 -Wall -Wextra -Wpedantic -Werror -fsanitize=address,undefined -fno-omit-frame-pointer
+CXX_FLAGS = -g -std=c++17 -arch x86_64 -Wall -Wextra -Wpedantic -Werror
 

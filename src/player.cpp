@@ -11,6 +11,13 @@ Player::Player(std::string name)
       level_(1),
       gold_(0){
         setGravityScale(1.0F);
+        setFaction(Faction::Friendly);
+        x_ = 140.0F;
+        moveSpeed_ = 240.0F;
+        health_ = 10.0F;
+        maxHealth_ = 10.0F;
+        attackDamage_ = 5.0F;
+        jumpInitialVelocity_ = 480.0F;
       }
 // 创建了主角，并且可以二连跳
 
@@ -69,6 +76,10 @@ void Player::levelUp() {
 
 void Player::attack() {
     std::cout << "Attack!!!" << std::endl;
+}
+
+void Player::attack(Character& target) {
+    target.takeDamage(attackDamage_);
 }
 
 int Player::getExperienceThreshold() const{

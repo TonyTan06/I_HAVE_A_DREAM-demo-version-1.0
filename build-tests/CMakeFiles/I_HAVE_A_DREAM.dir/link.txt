@@ -1,0 +1,1 @@
+/usr/bin/c++  -arch x86_64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/I_HAVE_A_DREAM.dir/src/main.cpp.o -o I_HAVE_A_DREAM  libgame_domain.a _deps/raylib-build/raylib/libraylib.a -framework IOKit -framework Cocoa -framework OpenGL -framework OpenGL -framework IOKit -framework Cocoa -framework CoreFoundation

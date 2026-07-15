@@ -1,2 +1,2 @@
-/usr/bin/ar qc libgame_domain.a CMakeFiles/game_domain.dir/src/character.cpp.o CMakeFiles/game_domain.dir/src/player.cpp.o CMakeFiles/game_domain.dir/src/enemy.cpp.o CMakeFiles/game_domain.dir/src/item.cpp.o
+/usr/bin/ar qc libgame_domain.a CMakeFiles/game_domain.dir/src/character.cpp.o CMakeFiles/game_domain.dir/src/player.cpp.o CMakeFiles/game_domain.dir/src/player_shadow.cpp.o CMakeFiles/game_domain.dir/src/enemy.cpp.o CMakeFiles/game_domain.dir/src/item.cpp.o
 /usr/bin/ranlib libgame_domain.a
