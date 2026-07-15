@@ -20,7 +20,9 @@ Scene::Scene()
       damageTextY_(0.0F),
       displayedDamage_(0.0F),
       attackEffectElapsedTime_(0.0F),
-      meleeAttackEffectElapsedTime_(0.0F) {
+      meleeAttackEffectElapsedTime_(0.0F),
+      meleeEnemyExperienceAwarded_(false),
+      rangedEnemyExperienceAwarded_(false) {
     rangedEnemy_.setPosition(platform_.x + platform_.width - PLAYER_WIDTH, 0.0F);
     meleeEnemy_.setPosition(rangedEnemy_.getX() - ENEMY_SPACING, 0.0F);
 }
@@ -235,10 +237,12 @@ void Scene::update(float deltaTime) {
 
         Character* hitTarget = nullptr;
         Rectangle hitbox{};
-        if (CheckCollisionRecs(playerAttackHitbox, meleeEnemyHitbox)) {
+        if (meleeEnemy_.isAlive() &&
+            CheckCollisionRecs(playerAttackHitbox, meleeEnemyHitbox)) {
             hitTarget = &meleeEnemy_;
             hitbox = meleeEnemyHitbox;
-        } else if (CheckCollisionRecs(playerAttackHitbox, rangedEnemyHitbox)) {
+        } else if (rangedEnemy_.isAlive() &&
+                   CheckCollisionRecs(playerAttackHitbox, rangedEnemyHitbox)) {
             hitTarget = &rangedEnemy_;
             hitbox = rangedEnemyHitbox;
         }
@@ -251,6 +255,19 @@ void Scene::update(float deltaTime) {
             damageTextY_ = hitbox.y - 20.0F;
         }
     }
+
+    const auto awardEnemyExperience = [&](const Enemy& enemy, bool& experienceAwarded) {
+        if (enemy.isAlive()) {
+            experienceAwarded = false;
+            return;
+        }
+        if (!experienceAwarded) {
+            player_.addExperience(ENEMY_EXPERIENCE_REWARD);
+            experienceAwarded = true;
+        }
+    };
+    awardEnemyExperience(meleeEnemy_, meleeEnemyExperienceAwarded_);
+    awardEnemyExperience(rangedEnemy_, rangedEnemyExperienceAwarded_);
 
     if (playerShadow_.has_value()) {
         // 影子是实体：空中时按 Character 的重力规则下落。
@@ -277,13 +294,15 @@ void Scene::update(float deltaTime) {
             PLAYER_WIDTH, PLAYER_HEIGHT};
         Character* hitTarget = nullptr;
         Rectangle hitbox{};
-        if (CheckCollisionRecs(playerAttackHitbox, shadowHitbox)) {
+        if (playerShadow_->isAlive() && CheckCollisionRecs(playerAttackHitbox, shadowHitbox)) {
             hitTarget = &*playerShadow_;
             hitbox = shadowHitbox;
-        } else if (CheckCollisionRecs(playerAttackHitbox, meleeEnemyHitbox)) {
+        } else if (meleeEnemy_.isAlive() &&
+                   CheckCollisionRecs(playerAttackHitbox, meleeEnemyHitbox)) {
             hitTarget = &meleeEnemy_;
             hitbox = meleeEnemyHitbox;
-        } else if (CheckCollisionRecs(playerAttackHitbox, rangedEnemyHitbox)) {
+        } else if (rangedEnemy_.isAlive() &&
+                   CheckCollisionRecs(playerAttackHitbox, rangedEnemyHitbox)) {
             hitTarget = &rangedEnemy_;
             hitbox = rangedEnemyHitbox;
         }
@@ -436,4 +455,8 @@ void Scene::draw() const {
     }
     DrawText("A/D or arrow keys: move    Space: jump    J: melee    K: ranged    U: defend", 20, 20, 20,
              RAYWHITE);
+    DrawText(TextFormat("Level: %d", player_.getLevel()), 20, 50, 20, RAYWHITE);
+    DrawText(TextFormat("Exp: %d / %d", player_.getExperience(),
+                        player_.getExperienceThreshold()),
+             20, 76, 20, RAYWHITE);
 }

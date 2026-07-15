@@ -11,6 +11,7 @@ uploads/
 build/
 build-tests/
 build-asan/
+build-debug/
 
 *.dSYM/
 

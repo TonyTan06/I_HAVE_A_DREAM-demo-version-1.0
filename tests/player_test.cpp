@@ -7,6 +7,7 @@ TEST(PlayerTest, StartsAtLevelOneWithNoGold) {
 
     EXPECT_EQ(player.getLevel(), 1);
     EXPECT_EQ(player.getGold(), 0);
+    EXPECT_EQ(player.getExperience(), 0);
     EXPECT_EQ(player.getMaxJumpCount(), 2);
     EXPECT_FLOAT_EQ(player.getHealth(), 10.0F);
     EXPECT_FLOAT_EQ(player.getMaxHealth(), 10.0F);
@@ -95,8 +96,22 @@ TEST(PlayerTest, CannotJumpMoreThanItsMaximumCount) {
 TEST(PlayerTest, LevelsUpWhenExperienceReachesThreshold) {
     Player player("Johnny");
     const int threshold = player.getExperienceThreshold();
+    player.takeDamage(5.0F);
 
     player.addExperience(threshold);
 
     EXPECT_EQ(player.getLevel(), 2);
+    EXPECT_FLOAT_EQ(player.getMaxHealth(), 15.0F);
+    EXPECT_FLOAT_EQ(player.getHealth(), 15.0F);
+    EXPECT_FLOAT_EQ(player.getAttackDamage(), 6.0F);
+    EXPECT_FLOAT_EQ(player.getAttacksPerSecond(), 0.1F);
+}
+
+TEST(PlayerTest, AddsExperienceFromAnEnemyKillReward) {
+    Player player("Johnny");
+    const int startingExperience = player.getExperience();
+
+    player.addExperience(5);
+
+    EXPECT_EQ(player.getExperience(), startingExperience + 5);
 }

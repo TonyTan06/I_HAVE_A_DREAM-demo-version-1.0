@@ -52,6 +52,8 @@ private:
     float displayedDamage_;
     float attackEffectElapsedTime_;
     float meleeAttackEffectElapsedTime_;
+    bool meleeEnemyExperienceAwarded_;
+    bool rangedEnemyExperienceAwarded_;
     std::vector<Projectile> projectiles_;
 
     static constexpr float PLAYER_WIDTH = 32.0F;
@@ -67,4 +69,5 @@ private:
     static constexpr float PROJECTILE_MAX_DISTANCE = 500.0F;
     static constexpr float ENEMY_SPACING = 100.0F;
     static constexpr float ENEMY_DETECTION_RANGE = 300.0F;
+    static constexpr int ENEMY_EXPERIENCE_REWARD = 5;
 };

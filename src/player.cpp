@@ -8,7 +8,7 @@ Player::Player(std::string name)
     : Character(std::move(name)),
       jumpCount_(0),
       maxJumpCount_(2),
-      experience_(1),
+      experience_(0),
       level_(1),
       gold_(0),
       isFacingRight_(true),
@@ -23,7 +23,7 @@ Player::Player(std::string name)
         health_ = 10.0F;
         maxHealth_ = 10.0F;
         attackDamage_ = 5.0F;
-        jumpInitialVelocity_ = 480.0F;
+        jumpInitialVelocity_ = 360.0F;
       }
 // 创建了主角，并且可以二连跳
 
@@ -76,11 +76,11 @@ void Player::addExperience(int value) {
 void Player::levelUp() {
     experience_ -= getExperienceThreshold();
     ++level_;
-    /*
-    maxHealth_ += ;
+    maxHealth_ += 5.0F;
     health_ = maxHealth_;
-    attackDamage_ += ;
-    attacksPerSecond_ += ;
+    attackDamage_ += 1.0F;
+    attacksPerSecond_ += 0.1F;
+    /*
     physicalDefense_ += ;
     magicalDefense_ += ;
     */
