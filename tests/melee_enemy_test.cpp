@@ -11,8 +11,32 @@ TEST(MeleeEnemyTest, CopiesPlayerCombatStatsAndFacesLeft) {
     EXPECT_FLOAT_EQ(enemy.getMaxHealth(), player.getMaxHealth());
     EXPECT_FLOAT_EQ(enemy.getAttackDamage(), player.getAttackDamage());
     EXPECT_FLOAT_EQ(enemy.getAttacksPerSecond(), 2.0F);
+    EXPECT_FLOAT_EQ(enemy.getDetectionRange(), 150.0F);
     EXPECT_FALSE(enemy.isFacingRight());
     EXPECT_EQ(enemy.getFaction(), Faction::Enemy);
+}
+
+TEST(MeleeEnemyTest, FacesTowardTargetsOnEitherSide) {
+    Player player("Player");
+    MeleeEnemy enemy(player);
+    Player target("Target");
+    enemy.setPosition(300.0F, 0.0F);
+
+    target.setPosition(400.0F, 0.0F);
+    enemy.faceToward(target);
+    EXPECT_TRUE(enemy.isFacingRight());
+
+    target.setPosition(200.0F, 0.0F);
+    enemy.faceToward(target);
+    EXPECT_FALSE(enemy.isFacingRight());
+}
+
+TEST(MeleeEnemyTest, UsesItsLevelToCalculateExperienceReward) {
+    Player player("Player");
+    MeleeEnemy enemy(player, 2);
+
+    EXPECT_EQ(enemy.getLevel(), 2);
+    EXPECT_EQ(enemy.getExperienceReward(), 10);
 }
 
 TEST(MeleeEnemyTest, DoesNotDamageAnEnemyFactionTarget) {

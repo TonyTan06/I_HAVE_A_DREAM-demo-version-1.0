@@ -25,3 +25,14 @@ TEST(CharacterTest, ProvidesAnOverridableRangedAttackFramework) {
 
     SUCCEED();
 }
+
+TEST(CharacterTest, CanLandAtAnElevatedPlatformHeight) {
+    Character character("Character");
+
+    character.landAtHeight(60.0F);
+    EXPECT_TRUE(character.isGrounded());
+    EXPECT_FLOAT_EQ(character.getY(), 60.0F);
+
+    character.beginFalling();
+    EXPECT_FALSE(character.isGrounded());
+}
