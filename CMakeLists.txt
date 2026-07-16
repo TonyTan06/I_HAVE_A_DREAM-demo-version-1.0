@@ -73,6 +73,16 @@ add_executable(I_HAVE_A_DREAM
     src/scene.cpp
 )
 
+# Keep the executable directly in build/ for both single- and multi-config
+# generators so the VS Code launch/task paths stay consistent.
+set_target_properties(I_HAVE_A_DREAM PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}"
+)
+
 target_link_libraries(I_HAVE_A_DREAM PRIVATE
     game_domain
     raylib
