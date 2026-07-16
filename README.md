@@ -7,6 +7,7 @@ I have a dream 群里的东西。
 #### 运行debug若有raylib报错，在终端运行以下代码：
 - rm -rf build
 - cmake -S . -B build/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTS=OFF
+
 #### 在运行时请耐心等待，并保持网络良好，第一次启动慢是正常的（5-10分钟左右），debug完成后运行以下代码：
 - cmake -S . -B build
 - cmake --build build
@@ -18,6 +19,24 @@ I have a dream 群里的东西。
 - cmake --build build
 - ./build/I_HAVE_A_DREAM （Mac/Linux）
 - .\build\Debug\I_HAVE_A_DREAM.exe （Win）
+
+### 运行docker镜像
+
+如果只是想快速构建并运行项目，可以直接使用 Docker。这样不需要在本机手动配置 CMake、raylib 或 Linux 图形环境。
+
+首先确保已经安装 Docker Desktop 或 Docker Engine。
+
+在项目根目录下运行：
+
+```bash
+docker compose up --build
+```
+
+构建完成后，在浏览器中打开：
+
+```
+http://localhost:6080/vnc.html?autoconnect=true&resize=scale
+```
 
 #### 创建一个branch，先：
 - git switch main
