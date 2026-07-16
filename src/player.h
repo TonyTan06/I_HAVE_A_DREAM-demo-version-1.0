@@ -1,6 +1,7 @@
 #pragma once
 
 #include "character.h"
+#include "player_controller.h"
 #include <string>
 
 class Player : public Character {
@@ -26,6 +27,11 @@ public:
     bool isDodging() const; // 当前是否正处于 0.2 秒闪避过程
     bool isDodgeCoolingDown() const; // 闪避是否仍在 5 秒冷却内
     float getDodgeCooldownProgress() const; // 冷却完成比例，0 表示刚开始，1 表示刚结束
+    float getLastDodgeDistance() const; // 上一帧由闪避产生的实际水平移动距离
+    // 把一帧设备无关输入应用到角色；返回本帧是否请求近战攻击。
+    virtual bool applyInput(const PlayerInputState& input,
+                            HorizontalInputDirection horizontalDirection,
+                            float deltaTime);
 
     int getJumpCount() const; //跳跃次数（可以实现二连跳）
     int getMaxJumpCount() const; //最大跳跃次数
@@ -50,10 +56,14 @@ private:
     bool dodgeRight_; // 本次闪避锁定的方向：true 向右，false 向左
     float dodgeElapsedTime_; // 当前闪避已进行的时间，单位：秒
     float dodgeCooldown_; // 下次可以闪避前的剩余时间，单位：秒
+    float lastDodgeDistance_; // 最近一次 update 中闪避实际移动的像素距离
 
     static constexpr float RANGED_ATTACK_INTERVAL = 0.75F; // 两次远程攻击之间的最短间隔
     static constexpr float DEFENSE_COOLDOWN = 2.0F; // 成功抵挡一次攻击后的冷却
     static constexpr float DODGE_DURATION = 0.2F; // 完成一次闪避所需的时间
     static constexpr float DODGE_COOLDOWN = 5.0F; // 两次闪避之间的冷却
 
+protected:
+    // 供 PlayerShadow 在生成时继承玩家的跳跃次数和当前朝向。
+    void copyMovementStateFrom(const Player& player);
 };

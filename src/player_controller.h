@@ -10,6 +10,8 @@ struct PlayerInputState {
     bool rangedAttackPressed = false; // 本帧是否刚触发一次远程攻击
     bool defendHeld = false; // 本帧是否持续要求玩家保持防御
     bool dodgePressed = false; // 本帧是否刚触发一次闪避
+    bool selectShadowSkill1Pressed = false; // 本帧是否按数字键 1 选择影子技能 1
+    bool useShadowSkill2Pressed = false; // 本帧是否按数字键 2 尝试使用影子技能 2
 };
 
 // 解析左右输入冲突后的水平移动方向。

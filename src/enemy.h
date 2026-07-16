@@ -26,6 +26,8 @@ public:
     int getLevel() const; // 返回当前敌军等级，最低为 1 级
     int getExperienceReward() const; // 返回击杀该敌军可获得的经验值
     float getDetectionRange() const; // 返回当前兵种用于选择目标的水平检测距离
+    bool isFacingRight() const; // 返回敌军当前水平朝向，默认朝左
+    void faceToward(const Character& target); // 根据目标水平位置更新朝向
 
     std::vector<LootItem> dropLoot(); //掉落物品表
 
@@ -35,6 +37,7 @@ protected:
     int level_;                // 敌军等级，用于计算击杀经验等奖励数值
     int experienceReward_;     // 击杀获得经验，当前公式为 5 × 敌军等级
     bool isAggro_;             // 是否进入仇恨状态
+    bool isFacingRight_;       // true 表示朝右，false 表示朝左
 
     float attackCooldown_; // 攻击冷却时间
     float timeSinceLastAttack_; // 自上次攻击以来的时间

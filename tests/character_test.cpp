@@ -36,3 +36,21 @@ TEST(CharacterTest, CanLandAtAnElevatedPlatformHeight) {
     character.beginFalling();
     EXPECT_FALSE(character.isGrounded());
 }
+
+TEST(CharacterTest, SwapsPositionAndGroundedPhysicsState) {
+    Character first("First");
+    Character second("Second");
+    first.setPosition(10.0F, 60.0F);
+    first.landAtHeight(60.0F);
+    second.setPosition(200.0F, 20.0F);
+    second.beginFalling();
+
+    first.swapPositionAndPhysics(second);
+
+    EXPECT_FLOAT_EQ(first.getX(), 200.0F);
+    EXPECT_FLOAT_EQ(first.getY(), 20.0F);
+    EXPECT_FALSE(first.isGrounded());
+    EXPECT_FLOAT_EQ(second.getX(), 10.0F);
+    EXPECT_FLOAT_EQ(second.getY(), 60.0F);
+    EXPECT_TRUE(second.isGrounded());
+}

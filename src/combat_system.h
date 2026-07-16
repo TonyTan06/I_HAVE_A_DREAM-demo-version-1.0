@@ -3,7 +3,6 @@
 #include "enemy.h"
 #include "melee_enemy.h"
 #include "player.h"
-#include "player_shadow.h"
 #include "raylib.h"
 
 #include <vector>
@@ -24,13 +23,12 @@ public:
     CombatSystem(float entityWidth, float entityHeight, float attackRange,
                  float defenseRange);
 
-    Character* findNearestEnemyTarget(const Enemy& enemy, Player& player,
-                                      PlayerShadow* shadow) const;
-    AttackResult playerMeleeAttack(Player& player, PlayerShadow* shadow,
+    Character* findNearestEnemyTarget(const Enemy& enemy, Player& player) const;
+    AttackResult playerMeleeAttack(Player& player,
                                    const std::vector<Enemy*>& enemies,
                                    float platformY) const;
     AttackResult enemyMeleeAttack(MeleeEnemy& enemy, Player& player,
-                                  PlayerShadow* shadow, float platformY) const;
+                                  float platformY) const;
 
     Rectangle makeCharacterHitbox(const Character& character, float platformY) const;
     Rectangle makeMeleeAttackHitbox(const Character& attacker, bool facingRight,

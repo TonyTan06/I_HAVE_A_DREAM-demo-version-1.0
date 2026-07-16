@@ -20,6 +20,10 @@ PlayerInputState PlayerController::mergeInputStates(
         first.rangedAttackPressed || second.rangedAttackPressed;
     merged.defendHeld = first.defendHeld || second.defendHeld;
     merged.dodgePressed = first.dodgePressed || second.dodgePressed;
+    merged.selectShadowSkill1Pressed =
+        first.selectShadowSkill1Pressed || second.selectShadowSkill1Pressed;
+    merged.useShadowSkill2Pressed =
+        first.useShadowSkill2Pressed || second.useShadowSkill2Pressed;
 
     return merged;
 }
@@ -45,6 +49,8 @@ PlayerInputState PlayerController::pollKeyboard() const {
     input.rangedAttackPressed = IsKeyPressed(KEY_K);
     input.defendHeld = IsKeyDown(KEY_U);
     input.dodgePressed = IsKeyPressed(KEY_L);
+    input.selectShadowSkill1Pressed = IsKeyPressed(KEY_ONE);
+    input.useShadowSkill2Pressed = IsKeyPressed(KEY_TWO);
 
     return input;
 }

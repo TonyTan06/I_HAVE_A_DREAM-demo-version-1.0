@@ -9,7 +9,7 @@ Scene::Scene()
       rangedEnemy_(player_),
       playerSpawnX_(player_.getX()),
       playerSpawnY_(player_.getY()),
-      shadowSystem_(player_),
+      shadowManager_(player_),
       combatSystem_(CHARACTER_WIDTH, CHARACTER_HEIGHT, 16.0F, 8.0F),
       platform_{0.0F, 360.0F, 1200.0F, 40.0F},
       damageTextElapsedTime_(0.0F),
@@ -17,6 +17,7 @@ Scene::Scene()
       damageTextY_(0.0F),
       displayedDamage_(0.0F),
       attackEffectElapsedTime_(0.0F),
+      shadowAttackEffectElapsedTime_(0.0F),
       meleeAttackEffectElapsedTime_(0.0F),
       meleeEnemyExperienceAwarded_(false),
       rangedEnemyExperienceAwarded_(false) {
@@ -49,33 +50,47 @@ Rectangle Scene::makeCharacterHitbox(
         Scene::CHARACTER_HEIGHT};
 }
 
+void Scene::drawBackVerticalCooldownBar(
+    const Character& character, bool facingRight,
+    float characterTop, float cooldownProgress) {
+    const float clampedProgress = std::clamp(cooldownProgress, 0.0F, 1.0F);
+    const int barX = static_cast<int>(facingRight
+        ? character.getX() - 6.0F
+        : character.getX() + Scene::CHARACTER_WIDTH + 2.0F);
+    const int barY = static_cast<int>(characterTop);
+    const int barHeight = static_cast<int>(Scene::CHARACTER_HEIGHT);
+    const int progressHeight = static_cast<int>(barHeight * clampedProgress);
+
+    DrawRectangle(barX, barY, 4, barHeight, DARKGRAY);
+    DrawRectangle(barX, barY + barHeight - progressHeight,
+                  4, progressHeight, GREEN);
+}
+
+void Scene::showDamageText(float damage, float textX, float textY) {
+    displayedDamage_ = damage;
+    damageTextElapsedTime_ = DAMAGE_TEXT_LIFETIME;
+    damageTextX_ = textX;
+    damageTextY_ = textY;
+}
+
 void Scene::update(float deltaTime) {
     // Scene 只读取设备无关状态，不直接判断键盘或手柄的具体按键。
     const PlayerInputState input = playerController_.pollInput();
     const HorizontalInputDirection horizontalDirection =
         PlayerController::resolveHorizontalDirection(input);
-    if (!player_.isDodging()) {
-        if (horizontalDirection == HorizontalInputDirection::Left) {
-            player_.moveLeft(deltaTime);
-        } else if (horizontalDirection == HorizontalInputDirection::Right) {
-            player_.moveRight(deltaTime);
-        }
+    PlayerShadow* synchronizedShadow = shadowManager_.getShadow();
+    if (input.useShadowSkill2Pressed && synchronizedShadow != nullptr) {
+        synchronizedShadow->tryUsePositionSwap(player_);
     }
-    if (input.jumpPressed) {
-        player_.jump();
+    if (input.selectShadowSkill1Pressed && synchronizedShadow != nullptr) {
+        // 测试阶段直接切换当前影子的技能；技能状态由 PlayerShadow 自己保存。
+        synchronizedShadow->setActiveSkill(ShadowSkill::SynchronizePlayerActions);
     }
-    // 防御需要持续按住；闪避期间角色仍可维持防御状态，但敌人不会锁定闪避中的玩家。
-    player_.setDefending(input.defendHeld);
-    const bool attackPressed = input.meleeAttackPressed && !player_.isDefending();
-    if (input.rangedAttackPressed && !player_.isDefending()) {
-        player_.rangedAttack();
-    }
-    if (input.dodgePressed) {
-        // 优先使用本帧按下的方向；没有水平输入时沿上次朝向闪避。
-        const bool dodgeRight = horizontalDirection == HorizontalInputDirection::Right ||
-            (horizontalDirection == HorizontalInputDirection::None && player_.isFacingRight());
-        player_.startDodge(dodgeRight);
-    }
+    const bool attackPressed =
+        player_.applyInput(input, horizontalDirection, deltaTime);
+    const bool shadowAttackPressed = synchronizedShadow != nullptr
+        ? synchronizedShadow->applyInput(input, horizontalDirection, deltaTime)
+        : false;
 
     // 所有角色共用平台支撑、实体更新、小平台落地和主地面落地顺序。
     const auto updateCharacterPhysics = [&](Character& character) {
@@ -105,6 +120,10 @@ void Scene::update(float deltaTime) {
         attackEffectElapsedTime_ =
             std::max(0.0F, attackEffectElapsedTime_ - deltaTime);
     }
+    if (shadowAttackEffectElapsedTime_ > 0.0F) {
+        shadowAttackEffectElapsedTime_ =
+            std::max(0.0F, shadowAttackEffectElapsedTime_ - deltaTime);
+    }
     if (meleeAttackEffectElapsedTime_ > 0.0F) {
         meleeAttackEffectElapsedTime_ =
             std::max(0.0F, meleeAttackEffectElapsedTime_ - deltaTime);
@@ -112,33 +131,42 @@ void Scene::update(float deltaTime) {
     if (attackPressed) {
         attackEffectElapsedTime_ = ATTACK_EFFECT_LIFETIME;
     }
+    if (shadowAttackPressed) {
+        shadowAttackEffectElapsedTime_ = ATTACK_EFFECT_LIFETIME;
+    }
 
-    if (player_.consumeRangedAttackRequest()) {
-        const float direction = player_.isFacingRight() ? 1.0F : -1.0F;
-        const float projectileX = player_.isFacingRight()
-            ? player_.getX() + CHARACTER_WIDTH + PROJECTILE_RADIUS
-            : player_.getX() - PROJECTILE_RADIUS;
+    const auto spawnFriendlyProjectile = [&](Player& attacker) {
+        if (!attacker.consumeRangedAttackRequest()) return;
+
+        const float direction = attacker.isFacingRight() ? 1.0F : -1.0F;
+        const float projectileX = attacker.isFacingRight()
+            ? attacker.getX() + CHARACTER_WIDTH + PROJECTILE_RADIUS
+            : attacker.getX() - PROJECTILE_RADIUS;
         projectileSystem_.spawn(ProjectileSystem::SpawnInfo{
             projectileX,
-            platform_.y - CHARACTER_HEIGHT / 2.0F - player_.getY(),
+            platform_.y - CHARACTER_HEIGHT / 2.0F - attacker.getY(),
             direction,
             PROJECTILE_SPEED,
             PROJECTILE_MAX_DISTANCE,
             PROJECTILE_RADIUS,
-            player_.getAttackDamage(),
+            attacker.getAttackDamage(),
             Faction::Friendly,
             ORANGE,
             0});
+    };
+    spawnFriendlyProjectile(player_);
+    if (synchronizedShadow != nullptr) {
+        spawnFriendlyProjectile(*synchronizedShadow);
     }
 
     const CombatSystem::AttackResult enemyMeleeResult = combatSystem_.enemyMeleeAttack(
-        meleeEnemy_, player_, shadowSystem_.getShadow(), platform_.y);
+        meleeEnemy_, player_, platform_.y);
     if (enemyMeleeResult.attackPerformed) {
         meleeAttackEffectElapsedTime_ = ATTACK_EFFECT_LIFETIME;
     }
 
     Character* rangedEnemyTarget = combatSystem_.findNearestEnemyTarget(
-        rangedEnemy_, player_, shadowSystem_.getShadow());
+        rangedEnemy_, player_);
     if (rangedEnemyTarget != nullptr) {
         // 朝向、子弹出生侧和飞行方向都使用同一个目标判断结果。
         rangedEnemy_.faceToward(*rangedEnemyTarget);
@@ -171,12 +199,7 @@ void Scene::update(float deltaTime) {
         combatSystem_.makePlayerDefenseHitbox(player_, platform_.y),
         [&]() { return player_.blockNextAttack(); }};
     projectileTargets.push_back(playerTarget);
-    if (PlayerShadow* shadow = shadowSystem_.getShadow(); shadow != nullptr) {
-        projectileTargets.push_back(ProjectileSystem::Target{
-            shadow,
-            makeCharacterHitbox(*shadow, platform_),
-            false, false, Rectangle{}, {}});
-    }
+    // 影子没有受击判定，不加入弹道目标列表；所有弹道都会直接穿过。
     projectileTargets.push_back(ProjectileSystem::Target{
         &meleeEnemy_,
         makeCharacterHitbox(meleeEnemy_, platform_),
@@ -190,10 +213,7 @@ void Scene::update(float deltaTime) {
         projectileSystem_.update(deltaTime, projectileTargets);
     for (const ProjectileSystem::Impact& impact : projectileImpacts) {
         if (impact.blocked) continue;
-        displayedDamage_ = impact.damage;
-        damageTextElapsedTime_ = DAMAGE_TEXT_LIFETIME;
-        damageTextX_ = impact.textX;
-        damageTextY_ = impact.textY;
+        showDamageText(impact.damage, impact.textX, impact.textY);
     }
 
     if (!player_.isAlive()) {
@@ -201,18 +221,29 @@ void Scene::update(float deltaTime) {
         player_.heal(player_.getMaxHealth());
         player_.setPosition(playerSpawnX_, playerSpawnY_);
         player_.land();
-        shadowSystem_.resetPlayerTracking(player_);
+        shadowManager_.resetPlayerTracking(player_);
     }
 
     if (attackPressed) {
         const CombatSystem::AttackResult playerAttackResult = combatSystem_.playerMeleeAttack(
-            player_, shadowSystem_.getShadow(), {&meleeEnemy_, &rangedEnemy_}, platform_.y);
+            player_, {&meleeEnemy_, &rangedEnemy_}, platform_.y);
         if (playerAttackResult.hit) {
-            displayedDamage_ = playerAttackResult.damage;
-            damageTextElapsedTime_ = DAMAGE_TEXT_LIFETIME;
-            damageTextX_ = playerAttackResult.targetHitbox.x +
-                playerAttackResult.targetHitbox.width / 2.0F;
-            damageTextY_ = playerAttackResult.targetHitbox.y - 20.0F;
+            showDamageText(
+                playerAttackResult.damage,
+                playerAttackResult.targetHitbox.x +
+                    playerAttackResult.targetHitbox.width / 2.0F,
+                playerAttackResult.targetHitbox.y - 20.0F);
+        }
+    }
+    if (shadowAttackPressed && synchronizedShadow != nullptr) {
+        const CombatSystem::AttackResult shadowAttackResult = combatSystem_.playerMeleeAttack(
+            *synchronizedShadow, {&meleeEnemy_, &rangedEnemy_}, platform_.y);
+        if (shadowAttackResult.hit) {
+            showDamageText(
+                shadowAttackResult.damage,
+                shadowAttackResult.targetHitbox.x +
+                    shadowAttackResult.targetHitbox.width / 2.0F,
+                shadowAttackResult.targetHitbox.y - 20.0F);
         }
     }
 
@@ -231,8 +262,8 @@ void Scene::update(float deltaTime) {
     awardEnemyExperience(meleeEnemy_, meleeEnemyExperienceAwarded_);
     awardEnemyExperience(rangedEnemy_, rangedEnemyExperienceAwarded_);
 
-    // 影子自身生命周期仍由 ShadowSystem 管理，平台系统只处理实体支撑和落地。
-    PlayerShadow* shadowBeforeUpdate = shadowSystem_.getShadow();
+    // ShadowManager 负责生命周期，平台系统只负责实体支撑和落地。
+    PlayerShadow* shadowBeforeUpdate = shadowManager_.getShadow();
     const bool hadShadowBeforeUpdate = shadowBeforeUpdate != nullptr;
     const float previousShadowHeight = hadShadowBeforeUpdate
         ? shadowBeforeUpdate->getY()
@@ -241,8 +272,8 @@ void Scene::update(float deltaTime) {
         platformSystem_.updateCharacterSupport(
             *shadowBeforeUpdate, platform_.y, CHARACTER_WIDTH);
     }
-    shadowSystem_.update(player_, deltaTime);
-    if (PlayerShadow* shadowAfterUpdate = shadowSystem_.getShadow();
+    shadowManager_.update(player_, deltaTime);
+    if (PlayerShadow* shadowAfterUpdate = shadowManager_.getShadow();
         shadowAfterUpdate != nullptr) {
         platformSystem_.updateCharacterSupport(
             *shadowAfterUpdate, platform_.y, CHARACTER_WIDTH);
@@ -251,6 +282,10 @@ void Scene::update(float deltaTime) {
             : shadowAfterUpdate->getY();
         platformSystem_.resolveCharacterLanding(
             *shadowAfterUpdate, heightBeforePhysics, platform_.y, CHARACTER_WIDTH);
+        const float maxShadowX = platform_.x + platform_.width - CHARACTER_WIDTH;
+        shadowAfterUpdate->setPosition(
+            std::clamp(shadowAfterUpdate->getX(), platform_.x, maxShadowX),
+            shadowAfterUpdate->getY());
     }
 }
 
@@ -259,7 +294,7 @@ void Scene::draw() const {
 
     DrawRectangleRec(platform_, Color{126, 91, 67, 255});
     platformSystem_.draw(Color{126, 91, 67, 255});
-    shadowSystem_.draw(platform_.y, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+    shadowManager_.draw(platform_.y, CHARACTER_WIDTH, CHARACTER_HEIGHT);
 
     const auto drawEnemy = [&](const Enemy& enemy, Color eyeColor, bool facingRight) {
         // respawning 控制敌人尸体期的浅色身体和黄色复活倒计时条。
@@ -295,16 +330,9 @@ void Scene::draw() const {
         Color{72, 183, 255, 255});
     const float playerTop = platform_.y - CHARACTER_HEIGHT - player_.getY();
     if (player_.isDodgeCoolingDown()) {
-        // 背向由当前朝向决定：右向时条在角色左侧，左向时条在角色右侧。
-        const float cooldownProgress = std::clamp(player_.getDodgeCooldownProgress(), 0.0F, 1.0F);
-        const int barX = static_cast<int>(player_.isFacingRight()
-            ? player_.getX() - 6.0F
-            : player_.getX() + CHARACTER_WIDTH + 2.0F);
-        const int barY = static_cast<int>(playerTop);
-        const int barHeight = static_cast<int>(CHARACTER_HEIGHT);
-        const int progressHeight = static_cast<int>(barHeight * cooldownProgress);
-        DrawRectangle(barX, barY, 4, barHeight, DARKGRAY);
-        DrawRectangle(barX, barY + barHeight - progressHeight, 4, progressHeight, GREEN);
+        drawBackVerticalCooldownBar(
+            player_, player_.isFacingRight(),
+            playerTop, player_.getDodgeCooldownProgress());
     }
     const float playerHealthRatio = player_.getHealth() / player_.getMaxHealth();
     DrawRectangle(static_cast<int>(player_.getX()), static_cast<int>(playerTop - 10.0F),
@@ -316,6 +344,13 @@ void Scene::draw() const {
         ? player_.getX() + CHARACTER_WIDTH - 8.0F
         : player_.getX() + 8.0F;
     DrawCircle(static_cast<int>(eyeX), static_cast<int>(playerTop + 14.0F), 3.0F, BLACK);
+    if (const PlayerShadow* shadow = shadowManager_.getShadow();
+        shadow != nullptr && shadow->isPositionSwapCoolingDown()) {
+        const float shadowTop = platform_.y - CHARACTER_HEIGHT - shadow->getY();
+        drawBackVerticalCooldownBar(
+            *shadow, shadow->isFacingRight(), shadowTop,
+            shadow->getPositionSwapCooldownProgress());
+    }
     if (player_.isDefending() || attackEffectElapsedTime_ > 0.0F) {
         const float bladeBaseX = player_.isFacingRight()
             ? player_.getX() + CHARACTER_WIDTH
@@ -333,6 +368,30 @@ void Scene::draw() const {
             DrawTriangle(bladeTop, bladeBottom, bladeTip, bladeColor);
         } else {
             // 左向时交换底边顶点，保持与右向一致的三角形顶点绕序。
+            DrawTriangle(bladeBottom, bladeTop, bladeTip, bladeColor);
+        }
+    }
+    if (const PlayerShadow* shadow = shadowManager_.getShadow();
+        shadow != nullptr &&
+        (shadow->isDefending() || shadowAttackEffectElapsedTime_ > 0.0F)) {
+        const float shadowTop = platform_.y - CHARACTER_HEIGHT - shadow->getY();
+        const float bladeBaseX = shadow->isFacingRight()
+            ? shadow->getX() + CHARACTER_WIDTH
+            : shadow->getX();
+        const Vector2 bladeTop{bladeBaseX, shadowTop};
+        const Vector2 bladeBottom{bladeBaseX, shadowTop + CHARACTER_HEIGHT};
+        const float bladeLength = shadow->isDefending()
+            ? combatSystem_.getDefenseRange()
+            : combatSystem_.getAttackRange();
+        const Vector2 bladeTip{
+            shadow->isFacingRight() ? bladeBaseX + bladeLength : bladeBaseX - bladeLength,
+            shadowTop + CHARACTER_HEIGHT / 2.0F};
+        const Color bladeColor = shadow->isDefending()
+            ? Color{255, 222, 173, 255}
+            : WHITE;
+        if (shadow->isFacingRight()) {
+            DrawTriangle(bladeTop, bladeBottom, bladeTip, bladeColor);
+        } else {
             DrawTriangle(bladeBottom, bladeTop, bladeTip, bladeColor);
         }
     }
@@ -359,7 +418,7 @@ void Scene::draw() const {
         DrawText(TextFormat("%.0f", displayedDamage_), static_cast<int>(damageTextX_),
                  static_cast<int>(damageTextY_), 20, YELLOW);
     }
-    DrawText("A/D or arrow keys: move    Space: jump    J: melee    K: ranged    U: defend    L: dodge", 20, 20, 20,
+    DrawText("A/D or arrow keys: move    Space: jump    J: melee    K: ranged    U: defend    L: dodge    1: sync shadow    2: swap", 20, 20, 20,
              RAYWHITE);
     DrawText(TextFormat("Level: %d", player_.getLevel()), 20, 50, 20, RAYWHITE);
     DrawText(TextFormat("Exp: %d / %d", player_.getExperience(),

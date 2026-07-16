@@ -10,8 +10,8 @@ CombatSystem::CombatSystem(float entityWidth, float entityHeight, float attackRa
       defenseRange_(defenseRange) {
 }
 
-Character* CombatSystem::findNearestEnemyTarget(const Enemy& enemy, Player& player,
-                                                PlayerShadow* shadow) const {
+Character* CombatSystem::findNearestEnemyTarget(
+    const Enemy& enemy, Player& player) const {
     Character* nearestTarget = nullptr; // 当前找到的最近有效目标
     float nearestDistance = enemy.getDetectionRange(); // 当前兵种允许的最大检测距离
 
@@ -27,28 +27,16 @@ Character* CombatSystem::findNearestEnemyTarget(const Enemy& enemy, Player& play
     };
 
     considerTarget(player, player.isDodging());
-    if (shadow != nullptr) {
-        considerTarget(*shadow, false);
-    }
     return nearestTarget;
 }
 
 CombatSystem::AttackResult CombatSystem::playerMeleeAttack(
-    Player& player, PlayerShadow* shadow, const std::vector<Enemy*>& enemies,
+    Player& player, const std::vector<Enemy*>& enemies,
     float platformY) const {
     const Rectangle attackHitbox =
         makeMeleeAttackHitbox(player, player.isFacingRight(), platformY);
     Character* target = nullptr;
     Rectangle targetHitbox{};
-
-    // 维持现有规则：影子优先于敌军成为玩家近战目标。
-    if (shadow != nullptr && shadow->isAlive()) {
-        const Rectangle shadowHitbox = makeCharacterHitbox(*shadow, platformY);
-        if (CheckCollisionRecs(attackHitbox, shadowHitbox)) {
-            target = shadow;
-            targetHitbox = shadowHitbox;
-        }
-    }
 
     for (Enemy* enemy : enemies) {
         if (target != nullptr) break;
@@ -70,13 +58,13 @@ CombatSystem::AttackResult CombatSystem::playerMeleeAttack(
 }
 
 CombatSystem::AttackResult CombatSystem::enemyMeleeAttack(
-    MeleeEnemy& enemy, Player& player, PlayerShadow* shadow, float platformY) const {
+    MeleeEnemy& enemy, Player& player, float platformY) const {
     // 近战兵无论是否找到目标都会按自身冷却挥刀。
     if (!enemy.tryAttack()) {
         return AttackResult{false, false, false, nullptr, 0.0F, Rectangle{}};
     }
 
-    Character* target = findNearestEnemyTarget(enemy, player, shadow);
+    Character* target = findNearestEnemyTarget(enemy, player);
     if (target == nullptr) {
         return AttackResult{true, false, false, nullptr, 0.0F, Rectangle{}};
     }

@@ -19,7 +19,8 @@ Player::Player(std::string name)
       isDodging_(false),
       dodgeRight_(true),
       dodgeElapsedTime_(0.0F),
-      dodgeCooldown_(0.0F) {
+      dodgeCooldown_(0.0F),
+      lastDodgeDistance_(0.0F) {
         setGravityScale(1.0F);
         setFaction(Faction::Friendly);
         x_ = 140.0F;
@@ -50,6 +51,8 @@ void Player::jump() {
 } //角色跳跃
 
 void Player::update(float deltaTime) {
+    // 每帧重新记录，供 ShadowManager 区分普通移动与闪避移动。
+    lastDodgeDistance_ = 0.0F;
     // 先更新角色共有的重力、跳跃等物理状态。
     Character::update(deltaTime);
 
@@ -66,7 +69,8 @@ void Player::update(float deltaTime) {
         const float movementTime = std::min(deltaTime, DODGE_DURATION - dodgeElapsedTime_);
         // 闪避总距离为“当前移速 × 1 秒”，因此必须在 DODGE_DURATION 内以该速度完成。
         const float dodgeSpeed = moveSpeed_ / DODGE_DURATION;
-        x_ += (dodgeRight_ ? 1.0F : -1.0F) * dodgeSpeed * movementTime;
+        lastDodgeDistance_ = dodgeSpeed * movementTime;
+        x_ += (dodgeRight_ ? 1.0F : -1.0F) * lastDodgeDistance_;
         dodgeElapsedTime_ += movementTime;
         if (dodgeElapsedTime_ >= DODGE_DURATION) {
             isDodging_ = false;
@@ -174,6 +178,43 @@ bool Player::isDodgeCoolingDown() const {
 float Player::getDodgeCooldownProgress() const {
     // 绘制时用“已冷却比例”，所以条会从空逐渐填满。
     return 1.0F - dodgeCooldown_ / DODGE_COOLDOWN;
+}
+
+float Player::getLastDodgeDistance() const {
+    return lastDodgeDistance_;
+}
+
+bool Player::applyInput(const PlayerInputState& input,
+                        HorizontalInputDirection horizontalDirection,
+                        float deltaTime) {
+    if (!isDodging()) {
+        if (horizontalDirection == HorizontalInputDirection::Left) {
+            moveLeft(deltaTime);
+        } else if (horizontalDirection == HorizontalInputDirection::Right) {
+            moveRight(deltaTime);
+        }
+    }
+    if (input.jumpPressed) {
+        jump();
+    }
+
+    setDefending(input.defendHeld);
+    const bool meleeAttackPressed = input.meleeAttackPressed && !isDefending();
+    if (input.rangedAttackPressed && !isDefending()) {
+        rangedAttack();
+    }
+    if (input.dodgePressed) {
+        const bool dodgeRight = horizontalDirection == HorizontalInputDirection::Right ||
+            (horizontalDirection == HorizontalInputDirection::None && isFacingRight());
+        startDodge(dodgeRight);
+    }
+    return meleeAttackPressed;
+}
+
+void Player::copyMovementStateFrom(const Player& player) {
+    jumpCount_ = player.jumpCount_;
+    maxJumpCount_ = player.maxJumpCount_;
+    isFacingRight_ = player.isFacingRight_;
 }
 
 int Player::getExperienceThreshold() const{

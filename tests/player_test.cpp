@@ -82,6 +82,7 @@ TEST(PlayerTest, DodgesOneSecondOfMovementDistanceInTwoTenthsOfASecond) {
 
     EXPECT_FALSE(player.isDodging());
     EXPECT_FLOAT_EQ(player.getX(), startingX + player.getMoveSpeed());
+    EXPECT_FLOAT_EQ(player.getLastDodgeDistance(), player.getMoveSpeed());
     EXPECT_TRUE(player.isDodgeCoolingDown());
     EXPECT_FALSE(player.startDodge(true));
 
@@ -131,4 +132,15 @@ TEST(PlayerTest, AddsExperienceFromAnEnemyKillReward) {
     player.addExperience(5);
 
     EXPECT_EQ(player.getExperience(), startingExperience + 5);
+}
+
+TEST(PlayerTest, AppliesDeviceIndependentMovementInput) {
+    Player player("Player");
+    PlayerInputState input;
+    input.moveLeftHeld = true;
+
+    player.applyInput(input, HorizontalInputDirection::Left, 0.5F);
+
+    EXPECT_FLOAT_EQ(player.getX(), 20.0F);
+    EXPECT_FALSE(player.isFacingRight());
 }

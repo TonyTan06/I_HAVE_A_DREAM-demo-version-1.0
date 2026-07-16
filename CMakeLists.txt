@@ -55,7 +55,7 @@ set(GAME_DOMAIN_SOURCES
     src/player_controller.cpp
     src/player_shadow.cpp
     src/platform_system.cpp
-    src/shadow_system.cpp
+    src/shadow_manager.cpp
     src/enemy.cpp
     src/melee_enemy.cpp
     src/ranged_enemy.cpp

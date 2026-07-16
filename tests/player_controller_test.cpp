@@ -12,6 +12,8 @@ TEST(PlayerControllerTest, DefaultInputStateHasNoActiveActions) {
     EXPECT_FALSE(input.rangedAttackPressed);
     EXPECT_FALSE(input.defendHeld);
     EXPECT_FALSE(input.dodgePressed);
+    EXPECT_FALSE(input.selectShadowSkill1Pressed);
+    EXPECT_FALSE(input.useShadowSkill2Pressed);
 }
 
 TEST(PlayerControllerTest, MergesInputFromDifferentDevices) {
@@ -22,6 +24,8 @@ TEST(PlayerControllerTest, MergesInputFromDifferentDevices) {
     PlayerInputState gamepadInput;
     gamepadInput.moveRightHeld = true;
     gamepadInput.dodgePressed = true;
+    gamepadInput.selectShadowSkill1Pressed = true;
+    gamepadInput.useShadowSkill2Pressed = true;
 
     const PlayerInputState merged =
         PlayerController::mergeInputStates(keyboardInput, gamepadInput);
@@ -30,6 +34,8 @@ TEST(PlayerControllerTest, MergesInputFromDifferentDevices) {
     EXPECT_TRUE(merged.moveRightHeld);
     EXPECT_TRUE(merged.meleeAttackPressed);
     EXPECT_TRUE(merged.dodgePressed);
+    EXPECT_TRUE(merged.selectShadowSkill1Pressed);
+    EXPECT_TRUE(merged.useShadowSkill2Pressed);
     EXPECT_FALSE(merged.jumpPressed);
     EXPECT_FALSE(merged.rangedAttackPressed);
     EXPECT_FALSE(merged.defendHeld);
