@@ -14,7 +14,7 @@ I have a dream 群里的东西。
 - ./build/I_HAVE_A_DREAM （Mac/Linux）
 - .\build\Debug\I_HAVE_A_DREAM.exe （Win）
 就可以启动游戏窗口了
-之后写完代码调试后就只用输入这两行：
+##### 第二次之后写完代码调试后就只用输入这两行：
 - cmake --build build
 - ./build/I_HAVE_A_DREAM （Mac/Linux）
 - .\build\Debug\I_HAVE_A_DREAM.exe （Win）

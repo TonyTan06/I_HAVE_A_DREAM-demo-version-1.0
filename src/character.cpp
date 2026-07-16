@@ -85,9 +85,20 @@ void Character::setPosition(float x, float y) {
 }
 
 void Character::land() {
-    y_ = 0.0F;
+    landAtHeight(0.0F);
+}
+
+void Character::landAtHeight(float height) {
+    y_ = std::max(0.0F, height);
     verticalVelocity_ = 0.0F;
     isGrounded_ = true;
+}
+
+void Character::beginFalling() {
+    if (!isGrounded_) return;
+
+    verticalVelocity_ = 0.0F;
+    isGrounded_ = false;
 }
 
 float Character::getMoveSpeed() const {
