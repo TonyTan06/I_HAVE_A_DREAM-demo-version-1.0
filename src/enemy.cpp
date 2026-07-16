@@ -1,14 +1,16 @@
 #include "enemy.h"
 
+#include <algorithm>
 #include <iostream>
 #include <utility>
 #include <random>
 
-Enemy::Enemy(std::string name)
+Enemy::Enemy(std::string name, int level)
     : Character(std::move(name)),
       detectionRange_(1.0F), //检测范围
       attackRange_(1.0F), //攻击范围
-      experienceReward_(0), //击杀经验奖励
+      level_(std::max(1, level)), //敌军等级最低为 1，避免生成无效等级敌军
+      experienceReward_(5 * level_), //击杀经验奖励，当前使用 f(x) = 5x
       isAggro_(false), //是否进入仇恨状态
       attackCooldown_(1.0F), //攻击冷却时间
       timeSinceLastAttack_(0.0F), //自上次攻击以来的时间
@@ -73,6 +75,21 @@ bool Enemy::isRespawning() const
 float Enemy::getRespawnProgress() const
 {
     return respawnElapsedTime_ / RESPAWN_DURATION;
+}
+
+int Enemy::getLevel() const
+{
+    return level_;
+}
+
+int Enemy::getExperienceReward() const
+{
+    return experienceReward_;
+}
+
+float Enemy::getDetectionRange() const
+{
+    return detectionRange_;
 }
 
 void Enemy::attack()
