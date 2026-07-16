@@ -5,25 +5,52 @@
 
 Scene::Scene()
     : player_("PLAYER"),
+      meleeEnemy_(player_),
+      rangedEnemy_(player_),
+      playerSpawnX_(player_.getX()),
+      playerSpawnY_(player_.getY()),
       platform_{0.0F, 360.0F, 800.0F, 40.0F},
       recordedPlayerX_(player_.getX()),
       recordedPlayerY_(player_.getY()),
+      previousPlayerX_(player_.getX()),
+      accumulatedPlayerHorizontalDistance_(0.0F),
       shadowElapsedTime_(0.0F),
       damageTextElapsedTime_(0.0F),
       damageTextX_(0.0F),
       damageTextY_(0.0F),
-      displayedDamage_(0.0F) {
+      displayedDamage_(0.0F),
+      attackEffectElapsedTime_(0.0F),
+      meleeAttackEffectElapsedTime_(0.0F),
+      meleeEnemyExperienceAwarded_(false),
+      rangedEnemyExperienceAwarded_(false) {
+    // 两个敌人固定出生在平台右侧，近战兵在远程兵左方 100px。
+    rangedEnemy_.setPosition(platform_.x + platform_.width - PLAYER_WIDTH, 0.0F);
+    meleeEnemy_.setPosition(rangedEnemy_.getX() - ENEMY_SPACING, 0.0F);
 }
 
 void Scene::update(float deltaTime) {
-    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
+    // 这两个布尔值表示本帧的水平输入，之后也用于决定 L 闪避的方向。
+    const bool moveLeftPressed = IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT);
+    const bool moveRightPressed = IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT);
+    if (!player_.isDodging() && moveLeftPressed) {
         player_.moveLeft(deltaTime);
     }
-    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
+    if (!player_.isDodging() && moveRightPressed) {
         player_.moveRight(deltaTime);
     }
     if (IsKeyPressed(KEY_SPACE)) {
         player_.jump();
+    }
+    // 防御需要持续按住；闪避期间角色仍可维持防御状态，但敌人不会锁定闪避中的玩家。
+    player_.setDefending(IsKeyDown(KEY_U));
+    const bool attackPressed = IsKeyPressed(KEY_J) && !player_.isDefending();
+    if (IsKeyPressed(KEY_K) && !player_.isDefending()) {
+        player_.rangedAttack();
+    }
+    if (IsKeyPressed(KEY_L)) {
+        // 优先使用本帧按下的方向；没有水平输入时沿上次朝向闪避。
+        const bool dodgeRight = moveRightPressed || (!moveLeftPressed && player_.isFacingRight());
+        player_.startDodge(dodgeRight);
     }
 
     player_.update(deltaTime);
@@ -31,15 +58,234 @@ void Scene::update(float deltaTime) {
     if (player_.getY() <= 0.0F) {
         player_.land();
     }
+    meleeEnemy_.update(deltaTime);
+    rangedEnemy_.update(deltaTime);
+    if (meleeEnemy_.getY() <= 0.0F) {
+        meleeEnemy_.land();
+    }
+    if (rangedEnemy_.getY() <= 0.0F) {
+        rangedEnemy_.land();
+    }
 
     const float maxPlayerX = platform_.x + platform_.width - PLAYER_WIDTH;
     player_.setPosition(
         std::clamp(player_.getX(), platform_.x, maxPlayerX), player_.getY());
+    // 记录实际 x 位移，而不是按键时间：碰墙、折返和闪避都会按真实移动距离计入影子阈值。
+    const float frameHorizontalDistance = std::abs(player_.getX() - previousPlayerX_);
+    previousPlayerX_ = player_.getX();
 
     // 伤害数字只保留一秒，与影子是否已经消失无关。
     if (damageTextElapsedTime_ > 0.0F) {
         damageTextElapsedTime_ = std::max(0.0F, damageTextElapsedTime_ - deltaTime);
     }
+    if (attackEffectElapsedTime_ > 0.0F) {
+        attackEffectElapsedTime_ =
+            std::max(0.0F, attackEffectElapsedTime_ - deltaTime);
+    }
+    if (meleeAttackEffectElapsedTime_ > 0.0F) {
+        meleeAttackEffectElapsedTime_ =
+            std::max(0.0F, meleeAttackEffectElapsedTime_ - deltaTime);
+    }
+    if (attackPressed) {
+        attackEffectElapsedTime_ = ATTACK_EFFECT_LIFETIME;
+    }
+
+    if (player_.consumeRangedAttackRequest()) {
+        const float direction = player_.isFacingRight() ? 1.0F : -1.0F;
+        const float projectileX = player_.isFacingRight()
+            ? player_.getX() + PLAYER_WIDTH + PROJECTILE_RADIUS
+            : player_.getX() - PROJECTILE_RADIUS;
+        projectiles_.push_back(Projectile{
+            projectileX,
+            platform_.y - PLAYER_HEIGHT / 2.0F - player_.getY(),
+            direction,
+            0.0F,
+            player_.getAttackDamage(),
+            Faction::Friendly,
+            false, false, false, false});
+    }
+
+    const auto findNearestEnemyTarget = [&](const Enemy& enemy) -> Character* {
+        // target 保存范围内最近的非同阵营可攻击单位；初始空表示本帧没有目标。
+        Character* target = nullptr;
+        float nearestDistance = ENEMY_DETECTION_RANGE;
+
+        const auto considerTarget = [&](Character& candidate) {
+            // 死亡、同阵营及闪避中的玩家不能成为敌军攻击目标。
+            if (!candidate.isAlive() || candidate.getFaction() == enemy.getFaction()) return;
+            if (&candidate == &player_ && player_.isDodging()) return;
+
+            const float distance = std::abs(candidate.getX() - enemy.getX());
+            if (distance <= nearestDistance) {
+                nearestDistance = distance;
+                target = &candidate;
+            }
+        };
+
+        considerTarget(player_);
+        if (playerShadow_.has_value()) {
+            considerTarget(*playerShadow_);
+        }
+        return target;
+    };
+
+    // 近战兵不依赖索敌：只要存活且冷却结束就挥刀；命中范围内的非同阵营目标才受伤。
+    if (meleeEnemy_.tryAttack()) {
+        meleeAttackEffectElapsedTime_ = ATTACK_EFFECT_LIFETIME;
+        Character* target = findNearestEnemyTarget(meleeEnemy_);
+        if (target != nullptr) {
+            const Rectangle meleeAttackHitbox{
+                meleeEnemy_.getX() - ATTACK_RANGE,
+                platform_.y - PLAYER_HEIGHT - meleeEnemy_.getY(),
+                ATTACK_RANGE, PLAYER_HEIGHT};
+            const Rectangle targetHitbox{
+                target->getX(), platform_.y - PLAYER_HEIGHT - target->getY(),
+                PLAYER_WIDTH, PLAYER_HEIGHT};
+            const Rectangle playerDefenseHitbox{
+                player_.isFacingRight() ? player_.getX() + PLAYER_WIDTH
+                                        : player_.getX() - DEFENSE_RANGE,
+                platform_.y - PLAYER_HEIGHT - player_.getY(), DEFENSE_RANGE, PLAYER_HEIGHT};
+            const bool isBlocked = target == &player_ && player_.isDefending() &&
+                CheckCollisionRecs(meleeAttackHitbox, playerDefenseHitbox) &&
+                player_.blockNextAttack();
+            if (CheckCollisionRecs(meleeAttackHitbox, targetHitbox) && !isBlocked) {
+                target->takeDamage(meleeEnemy_.getAttackDamage());
+            }
+        }
+    }
+
+    if (Character* target = findNearestEnemyTarget(rangedEnemy_);
+        target != nullptr && rangedEnemy_.tryAttack()) {
+        projectiles_.push_back(Projectile{
+            rangedEnemy_.getX() - PROJECTILE_RADIUS,
+            platform_.y - PLAYER_HEIGHT / 2.0F - rangedEnemy_.getY(),
+            -1.0F,
+            0.0F,
+            rangedEnemy_.getAttackDamage(),
+            Faction::Enemy,
+            false, false, false, false});
+    }
+
+    for (auto iterator = projectiles_.begin(); iterator != projectiles_.end();) {
+        // iterator 使用 erase 返回值，避免删除子弹后继续使用失效迭代器。
+        iterator->x += iterator->direction * PROJECTILE_SPEED * deltaTime;
+        iterator->travelledDistance += PROJECTILE_SPEED * deltaTime;
+        bool hitDamageableTarget = false;
+        const Rectangle playerDefenseHitbox{
+            player_.isFacingRight() ? player_.getX() + PLAYER_WIDTH
+                                    : player_.getX() - DEFENSE_RANGE,
+            platform_.y - PLAYER_HEIGHT - player_.getY(), DEFENSE_RANGE, PLAYER_HEIGHT};
+
+        const auto damageTarget = [&](Character& target, const Rectangle& hitbox,
+                                      bool& hasBeenHit) {
+            // 同阵营、死亡、闪避中的玩家都会让子弹继续飞行，不会消耗该子弹。
+            if (hitDamageableTarget || hasBeenHit || !target.isAlive() ||
+                target.getFaction() == iterator->faction) return;
+            if (&target == &player_ && player_.isDodging()) return;
+            if (!CheckCollisionCircleRec(
+                    Vector2{iterator->x, iterator->y}, PROJECTILE_RADIUS, hitbox)) return;
+
+            if (&target == &player_ && player_.isDefending() &&
+                CheckCollisionCircleRec(Vector2{iterator->x, iterator->y}, PROJECTILE_RADIUS,
+                                        playerDefenseHitbox) &&
+                player_.blockNextAttack()) {
+                hasBeenHit = true;
+                hitDamageableTarget = true;
+                return;
+            }
+            target.takeDamage(iterator->damage);
+            hasBeenHit = true;
+            hitDamageableTarget = true;
+            displayedDamage_ = iterator->damage;
+            damageTextElapsedTime_ = DAMAGE_TEXT_LIFETIME;
+            damageTextX_ = hitbox.x + hitbox.width / 2.0F;
+            damageTextY_ = hitbox.y - 20.0F;
+        };
+
+        damageTarget(player_, Rectangle{
+            player_.getX(), platform_.y - PLAYER_HEIGHT - player_.getY(),
+            PLAYER_WIDTH, PLAYER_HEIGHT}, iterator->hitPlayer);
+        if (playerShadow_.has_value()) {
+            const Rectangle shadowHitbox{
+                playerShadow_->getX(),
+                platform_.y - PLAYER_HEIGHT - playerShadow_->getY(),
+                PLAYER_WIDTH, PLAYER_HEIGHT};
+            damageTarget(*playerShadow_, shadowHitbox, iterator->hitShadow);
+        }
+        const Rectangle meleeEnemyHitbox{
+            meleeEnemy_.getX(), platform_.y - PLAYER_HEIGHT - meleeEnemy_.getY(),
+            PLAYER_WIDTH, PLAYER_HEIGHT};
+        const Rectangle rangedEnemyHitbox{
+            rangedEnemy_.getX(), platform_.y - PLAYER_HEIGHT - rangedEnemy_.getY(),
+            PLAYER_WIDTH, PLAYER_HEIGHT};
+        damageTarget(meleeEnemy_, meleeEnemyHitbox, iterator->hitMeleeEnemy);
+        damageTarget(rangedEnemy_, rangedEnemyHitbox, iterator->hitRangedEnemy);
+
+        // 命中第一个可伤害的非同阵营单位后销毁；同阵营单位直接穿过。
+        if (hitDamageableTarget || iterator->travelledDistance >= PROJECTILE_MAX_DISTANCE) {
+            iterator = projectiles_.erase(iterator);
+        } else {
+            ++iterator;
+        }
+    }
+
+    if (!player_.isAlive()) {
+        // 玩家死亡后立即在出生点回满血复活，并重新开始影子距离累计。
+        player_.heal(player_.getMaxHealth());
+        player_.setPosition(playerSpawnX_, playerSpawnY_);
+        player_.land();
+        previousPlayerX_ = playerSpawnX_;
+        accumulatedPlayerHorizontalDistance_ = 0.0F;
+    }
+
+    if (!playerShadow_.has_value() && attackPressed) {
+        const float playerTop = platform_.y - PLAYER_HEIGHT - player_.getY();
+        const float attackX = player_.isFacingRight()
+            ? player_.getX() + PLAYER_WIDTH
+            : player_.getX() - ATTACK_RANGE;
+        const Rectangle playerAttackHitbox{
+            attackX, playerTop, ATTACK_RANGE, PLAYER_HEIGHT};
+        const Rectangle meleeEnemyHitbox{
+            meleeEnemy_.getX(), platform_.y - PLAYER_HEIGHT - meleeEnemy_.getY(),
+            PLAYER_WIDTH, PLAYER_HEIGHT};
+        const Rectangle rangedEnemyHitbox{
+            rangedEnemy_.getX(), platform_.y - PLAYER_HEIGHT - rangedEnemy_.getY(),
+            PLAYER_WIDTH, PLAYER_HEIGHT};
+
+        Character* hitTarget = nullptr;
+        Rectangle hitbox{};
+        if (meleeEnemy_.isAlive() &&
+            CheckCollisionRecs(playerAttackHitbox, meleeEnemyHitbox)) {
+            hitTarget = &meleeEnemy_;
+            hitbox = meleeEnemyHitbox;
+        } else if (rangedEnemy_.isAlive() &&
+                   CheckCollisionRecs(playerAttackHitbox, rangedEnemyHitbox)) {
+            hitTarget = &rangedEnemy_;
+            hitbox = rangedEnemyHitbox;
+        }
+
+        if (hitTarget != nullptr) {
+            player_.attack(*hitTarget);
+            displayedDamage_ = player_.getAttackDamage();
+            damageTextElapsedTime_ = DAMAGE_TEXT_LIFETIME;
+            damageTextX_ = hitbox.x + hitbox.width / 2.0F;
+            damageTextY_ = hitbox.y - 20.0F;
+        }
+    }
+
+    const auto awardEnemyExperience = [&](const Enemy& enemy, bool& experienceAwarded) {
+        // 经验标记防止敌人 5 秒尸体期的每一帧都重复加经验。
+        if (enemy.isAlive()) {
+            experienceAwarded = false;
+            return;
+        }
+        if (!experienceAwarded) {
+            player_.addExperience(ENEMY_EXPERIENCE_REWARD);
+            experienceAwarded = true;
+        }
+    };
+    awardEnemyExperience(meleeEnemy_, meleeEnemyExperienceAwarded_);
+    awardEnemyExperience(rangedEnemy_, rangedEnemyExperienceAwarded_);
 
     if (playerShadow_.has_value()) {
         // 影子是实体：空中时按 Character 的重力规则下落。
@@ -48,20 +294,43 @@ void Scene::update(float deltaTime) {
             playerShadow_->land();
         }
 
-        const Rectangle playerHitbox{
-            player_.getX(), platform_.y - PLAYER_HEIGHT - player_.getY(),
-            PLAYER_WIDTH, PLAYER_HEIGHT};
+        const float playerTop = platform_.y - PLAYER_HEIGHT - player_.getY();
+        const float attackX = player_.isFacingRight()
+            ? player_.getX() + PLAYER_WIDTH
+            : player_.getX() - ATTACK_RANGE;
+        const Rectangle playerAttackHitbox{
+            attackX, playerTop, ATTACK_RANGE, PLAYER_HEIGHT};
         const Rectangle shadowHitbox{
             playerShadow_->getX(),
             platform_.y - PLAYER_HEIGHT - playerShadow_->getY(),
             PLAYER_WIDTH, PLAYER_HEIGHT};
-        // J 只在主角与影子碰撞箱重叠时命中，属于近战接触攻击。
-        if (IsKeyPressed(KEY_J) && CheckCollisionRecs(playerHitbox, shadowHitbox)) {
-            player_.attack(*playerShadow_);
+        const Rectangle meleeEnemyHitbox{
+            meleeEnemy_.getX(), platform_.y - PLAYER_HEIGHT - meleeEnemy_.getY(),
+            PLAYER_WIDTH, PLAYER_HEIGHT};
+        const Rectangle rangedEnemyHitbox{
+            rangedEnemy_.getX(), platform_.y - PLAYER_HEIGHT - rangedEnemy_.getY(),
+            PLAYER_WIDTH, PLAYER_HEIGHT};
+        Character* hitTarget = nullptr;
+        Rectangle hitbox{};
+        if (playerShadow_->isAlive() && CheckCollisionRecs(playerAttackHitbox, shadowHitbox)) {
+            hitTarget = &*playerShadow_;
+            hitbox = shadowHitbox;
+        } else if (meleeEnemy_.isAlive() &&
+                   CheckCollisionRecs(playerAttackHitbox, meleeEnemyHitbox)) {
+            hitTarget = &meleeEnemy_;
+            hitbox = meleeEnemyHitbox;
+        } else if (rangedEnemy_.isAlive() &&
+                   CheckCollisionRecs(playerAttackHitbox, rangedEnemyHitbox)) {
+            hitTarget = &rangedEnemy_;
+            hitbox = rangedEnemyHitbox;
+        }
+        // J 只命中朝向正前方 16px 的攻击框，属于近战攻击。
+        if (attackPressed && hitTarget != nullptr) {
+            player_.attack(*hitTarget);
             displayedDamage_ = player_.getAttackDamage();
             damageTextElapsedTime_ = DAMAGE_TEXT_LIFETIME;
-            damageTextX_ = shadowHitbox.x + shadowHitbox.width / 2.0F;
-            damageTextY_ = shadowHitbox.y - 20.0F;
+            damageTextX_ = hitbox.x + hitbox.width / 2.0F;
+            damageTextY_ = hitbox.y - 20.0F;
         }
 
         shadowElapsedTime_ += deltaTime;
@@ -70,14 +339,15 @@ void Scene::update(float deltaTime) {
             playerShadow_.reset();
             recordedPlayerX_ = player_.getX();
             recordedPlayerY_ = player_.getY();
+            accumulatedPlayerHorizontalDistance_ = 0.0F;
             shadowElapsedTime_ = 0.0F;
         }
         return;
     }
 
-    // 跳跃高度不影响生成；仅需横向移动距离达到阈值。
-    const float horizontalDistance = std::abs(player_.getX() - recordedPlayerX_);
-    if (horizontalDistance >= SHADOW_DISTANCE) {
+    // 仅在没有影子时累加横向位移，因此折返和跳跃中的横移都会计数。
+    accumulatedPlayerHorizontalDistance_ += frameHorizontalDistance;
+    if (accumulatedPlayerHorizontalDistance_ >= SHADOW_DISTANCE) {
         playerShadow_.emplace(player_, recordedPlayerX_, recordedPlayerY_);
         shadowElapsedTime_ = 0.0F;
     }
@@ -124,16 +394,100 @@ void Scene::draw() const {
             static_cast<int>(PLAYER_HEIGHT),
             Color{120, 170, 255, 80});
     }
+
+    const auto drawEnemy = [&](const Enemy& enemy, Color eyeColor) {
+        // respawning 控制敌人尸体期的浅色身体和黄色复活倒计时条。
+        const float enemyTop = platform_.y - PLAYER_HEIGHT - enemy.getY();
+        const int barX = static_cast<int>(enemy.getX());
+        const int barY = static_cast<int>(enemyTop - 10.0F);
+        const bool respawning = !enemy.isAlive() || enemy.isRespawning();
+        const Color bodyColor = respawning ? Color{235, 170, 170, 255}
+                                           : Color{190, 90, 90, 255};
+        const float barProgress = respawning
+            ? 1.0F - enemy.getRespawnProgress()
+            : enemy.getHealth() / enemy.getMaxHealth();
+
+        DrawRectangle(static_cast<int>(enemy.getX()), static_cast<int>(enemyTop),
+                      static_cast<int>(PLAYER_WIDTH), static_cast<int>(PLAYER_HEIGHT), bodyColor);
+        DrawRectangle(barX, barY, static_cast<int>(PLAYER_WIDTH), 5, DARKGRAY);
+        DrawRectangle(barX, barY,
+                      static_cast<int>(PLAYER_WIDTH * std::clamp(barProgress, 0.0F, 1.0F)),
+                      5, respawning ? YELLOW : RED);
+        DrawCircle(static_cast<int>(enemy.getX() + 8.0F),
+                   static_cast<int>(enemyTop + 14.0F), 3.0F, eyeColor);
+    };
+    drawEnemy(meleeEnemy_, BLUE);
+    drawEnemy(rangedEnemy_, GREEN);
     DrawRectangle(
         static_cast<int>(player_.getX()),
         static_cast<int>(platform_.y - PLAYER_HEIGHT - player_.getY()),
         static_cast<int>(PLAYER_WIDTH),
         static_cast<int>(PLAYER_HEIGHT),
         Color{72, 183, 255, 255});
+    const float playerTop = platform_.y - PLAYER_HEIGHT - player_.getY();
+    if (player_.isDodgeCoolingDown()) {
+        // 背向由当前朝向决定：右向时条在角色左侧，左向时条在角色右侧。
+        const float cooldownProgress = std::clamp(player_.getDodgeCooldownProgress(), 0.0F, 1.0F);
+        const int barX = static_cast<int>(player_.isFacingRight()
+            ? player_.getX() - 6.0F
+            : player_.getX() + PLAYER_WIDTH + 2.0F);
+        const int barY = static_cast<int>(playerTop);
+        const int barHeight = static_cast<int>(PLAYER_HEIGHT);
+        const int progressHeight = static_cast<int>(barHeight * cooldownProgress);
+        DrawRectangle(barX, barY, 4, barHeight, DARKGRAY);
+        DrawRectangle(barX, barY + barHeight - progressHeight, 4, progressHeight, GREEN);
+    }
+    const float playerHealthRatio = player_.getHealth() / player_.getMaxHealth();
+    DrawRectangle(static_cast<int>(player_.getX()), static_cast<int>(playerTop - 10.0F),
+                  static_cast<int>(PLAYER_WIDTH), 5, DARKGRAY);
+    DrawRectangle(static_cast<int>(player_.getX()), static_cast<int>(playerTop - 10.0F),
+                  static_cast<int>(PLAYER_WIDTH * std::clamp(playerHealthRatio, 0.0F, 1.0F)),
+                  5, GREEN);
+    const float eyeX = player_.isFacingRight()
+        ? player_.getX() + PLAYER_WIDTH - 8.0F
+        : player_.getX() + 8.0F;
+    DrawCircle(static_cast<int>(eyeX), static_cast<int>(playerTop + 14.0F), 3.0F, BLACK);
+    if (player_.isDefending() || attackEffectElapsedTime_ > 0.0F) {
+        const float bladeBaseX = player_.isFacingRight()
+            ? player_.getX() + PLAYER_WIDTH
+            : player_.getX();
+        const Vector2 bladeTop{bladeBaseX, playerTop};
+        const Vector2 bladeBottom{bladeBaseX, playerTop + PLAYER_HEIGHT};
+        const float bladeLength = player_.isDefending() ? DEFENSE_RANGE : ATTACK_RANGE;
+        const Vector2 bladeTip{
+            player_.isFacingRight() ? bladeBaseX + bladeLength : bladeBaseX - bladeLength,
+            playerTop + PLAYER_HEIGHT / 2.0F};
+        const Color bladeColor = player_.isDefending() ? Color{255, 222, 173, 255} : WHITE;
+        if (player_.isFacingRight()) {
+            DrawTriangle(bladeTop, bladeBottom, bladeTip, bladeColor);
+        } else {
+            // 左向时交换底边顶点，保持与右向一致的三角形顶点绕序。
+            DrawTriangle(bladeBottom, bladeTop, bladeTip, bladeColor);
+        }
+    }
+    if (meleeAttackEffectElapsedTime_ > 0.0F) {
+        const float enemyTop = platform_.y - PLAYER_HEIGHT - meleeEnemy_.getY();
+        const float bladeBaseX = meleeEnemy_.getX();
+        const Vector2 bladeTop{bladeBaseX, enemyTop};
+        const Vector2 bladeBottom{bladeBaseX, enemyTop + PLAYER_HEIGHT};
+        const Vector2 bladeTip{bladeBaseX - ATTACK_RANGE, enemyTop + PLAYER_HEIGHT / 2.0F};
+        DrawTriangle(bladeBottom, bladeTop, bladeTip, Color{255, 182, 193, 255});
+    }
+    for (const Projectile& projectile : projectiles_) {
+        DrawCircle(static_cast<int>(projectile.x), static_cast<int>(projectile.y),
+                   PROJECTILE_RADIUS,
+                   projectile.faction == Faction::Enemy
+                       ? Color{255, 45, 20, 255}
+                       : ORANGE);
+    }
     if (damageTextElapsedTime_ > 0.0F) {
         DrawText(TextFormat("%.0f", displayedDamage_), static_cast<int>(damageTextX_),
                  static_cast<int>(damageTextY_), 20, YELLOW);
     }
-    DrawText("A/D or arrow keys: move    Space: jump    J: attack", 20, 20, 20,
+    DrawText("A/D or arrow keys: move    Space: jump    J: melee    K: ranged    U: defend    L: dodge", 20, 20, 20,
              RAYWHITE);
+    DrawText(TextFormat("Level: %d", player_.getLevel()), 20, 50, 20, RAYWHITE);
+    DrawText(TextFormat("Exp: %d / %d", player_.getExperience(),
+                        player_.getExperienceThreshold()),
+             20, 76, 20, RAYWHITE);
 }

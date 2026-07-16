@@ -11,7 +11,9 @@ Enemy::Enemy(std::string name)
       experienceReward_(0), //击杀经验奖励
       isAggro_(false), //是否进入仇恨状态
       attackCooldown_(1.0F), //攻击冷却时间
-      timeSinceLastAttack_(0.0F) //自上次攻击以来的时间
+      timeSinceLastAttack_(0.0F), //自上次攻击以来的时间
+      isRespawning_(false),
+      respawnElapsedTime_(0.0F)
 {
     setGravityScale(1.0F);
     setFaction(Faction::Enemy);
@@ -38,9 +40,21 @@ std::vector<LootItem> Enemy::dropLoot() {
 
 void Enemy::update(float deltaTime)
 {
-    Character::update(deltaTime);
+    if (!isAlive()) {
+        // 死亡敌人停在原地，不再受重力、攻击冷却或 AI 逻辑影响。
+        isRespawning_ = true;
+        respawnElapsedTime_ += deltaTime;
+        if (respawnElapsedTime_ >= RESPAWN_DURATION) {
+            // 原地回满血，下一帧重新作为可攻击、可受击单位参与场景。
+            health_ = maxHealth_;
+            isRespawning_ = false;
+            respawnElapsedTime_ = 0.0F;
+            resetAttackCooldown();
+        }
+        return;
+    }
 
-    if (!isAlive()) return;
+    Character::update(deltaTime);
 
     timeSinceLastAttack_ += deltaTime;
 
@@ -51,15 +65,39 @@ void Enemy::update(float deltaTime)
     // 4. 进入攻击范围后 attack()
 }
 
+bool Enemy::isRespawning() const
+{
+    return isRespawning_;
+}
+
+float Enemy::getRespawnProgress() const
+{
+    return respawnElapsedTime_ / RESPAWN_DURATION;
+}
+
 void Enemy::attack()
 {
-    if (!isAlive()) return;
-
-    if (timeSinceLastAttack_ < attackCooldown_) return; //攻击间隔小于攻击冷却时间则无法攻击
+    if (!tryAttack()) return;
 
     std::cout << name_ << " attacks!" << std::endl;
+}
+
+bool Enemy::tryAttack()
+{
+    if (!isAlive()) return false;
+    if (timeSinceLastAttack_ < attackCooldown_) return false;
 
     resetAttackCooldown();
+    return true;
+}
+
+bool Enemy::attack(Character& target)
+{
+    if (target.getFaction() == getFaction()) return false;
+    if (!tryAttack()) return false;
+
+    target.takeDamage(attackDamage_);
+    return true;
 }
 
 void Enemy::resetAttackCooldown()

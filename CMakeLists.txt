@@ -53,6 +53,8 @@ set(GAME_DOMAIN_SOURCES
     src/player.cpp
     src/player_shadow.cpp
     src/enemy.cpp
+    src/melee_enemy.cpp
+    src/ranged_enemy.cpp
     src/item.cpp
 )
 

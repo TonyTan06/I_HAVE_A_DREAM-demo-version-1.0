@@ -55,6 +55,10 @@ void Character::attack() {
     
 }
 
+void Character::rangedAttack() {
+    // 基类不定义远程攻击表现，保留给 Player、Enemy 等派生类覆写。
+}
+
 bool Character::isAlive() const {
     return health_ > 0.0F;
 } //检测存活
