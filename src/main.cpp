@@ -2,8 +2,8 @@
 #include "raylib.h"
 
 int main() {
-    // 创建 raylib 游戏窗口；场景自身负责输入、更新和绘制。
-    InitWindow(800, 450, "I HAVE A DREAM");
+    // 窗口宽度与当前 1200px 平台一致，高度继续保持 450px。
+    InitWindow(1200, 450, "I HAVE A DREAM");
     SetTargetFPS(60);
 
     Scene scene;

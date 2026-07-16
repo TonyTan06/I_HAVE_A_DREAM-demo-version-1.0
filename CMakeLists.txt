@@ -50,15 +50,22 @@ endif()
 
 set(GAME_DOMAIN_SOURCES
     src/character.cpp
+    src/combat_system.cpp
     src/player.cpp
+    src/player_controller.cpp
     src/player_shadow.cpp
+    src/platform_system.cpp
+    src/shadow_system.cpp
     src/enemy.cpp
     src/melee_enemy.cpp
     src/ranged_enemy.cpp
+    src/projectile_system.cpp
     src/item.cpp
 )
 
 add_library(game_domain ${GAME_DOMAIN_SOURCES})
+
+target_link_libraries(game_domain PUBLIC raylib)
 
 target_include_directories(game_domain PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src

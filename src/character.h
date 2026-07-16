@@ -32,6 +32,8 @@ public:
     float getY() const; //获取角色相对地面的高度
     void setPosition(float x, float y); //设置角色位置
     void land(); //将角色放回地面并重置竖直速度
+    void landAtHeight(float height); //让角色站在指定离地高度并重置竖直速度
+    void beginFalling(); //角色走出高处平台时解除落地状态并开始受重力影响
     float getMoveSpeed() const;
     float getPhysicalDefense() const;
     float getMagicalDefense() const;
