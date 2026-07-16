@@ -42,6 +42,7 @@
 
 ### 调整
 
+- 补充 Enemy 公共朝向、PlayerShadow 技能、ShadowManager 距离与生命周期，以及 Scene UI 辅助函数的中文职责和变量注释。
 - 敌军朝向状态与面向目标逻辑统一上移至 `Enemy` 基类，`MeleeEnemy` 和 `RangedEnemy` 删除重复的朝向成员与函数实现。
 - 弹道、玩家近战和影子近战的伤害数字状态统一通过 Scene 的 `showDamageText()` 设置，不再重复写入伤害值、显示时间和文本坐标。
 - 玩家闪避与影子技能 2 的背向绿色竖直冷却条统一使用 Scene 的同一个 UI 绘制函数，分别传入实体与冷却进度调用。

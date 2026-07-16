@@ -31,12 +31,14 @@ void PlayerShadow::takeDamage(float damage) {
 }
 
 void PlayerShadow::update(float deltaTime) {
+    // 先更新继承自 Player 的重力、动作和普通冷却，再更新影子技能冷却。
     Player::update(deltaTime);
     positionSwapCooldown_ =
         std::max(0.0F, positionSwapCooldown_ - std::max(0.0F, deltaTime));
 }
 
 void PlayerShadow::setActiveSkill(ShadowSkill skill) {
+    // 技能状态属于当前影子实体，ShadowManager 不参与技能选择。
     activeSkill_ = skill;
     applyActiveSkillState();
 }
@@ -56,8 +58,10 @@ bool PlayerShadow::applyInput(
 }
 
 bool PlayerShadow::tryUsePositionSwap(Player& player) {
+    // 冷却期间按数字键 2 不产生交换，也不会重置剩余冷却。
     if (positionSwapCooldown_ > 0.0F) return false;
 
+    // 交换包含 x/y、竖直速度与 isGrounded，确保空中状态跟随位置一起交换。
     setActiveSkill(ShadowSkill::SwapPosition);
     swapPositionAndPhysics(player);
     positionSwapCooldown_ = POSITION_SWAP_COOLDOWN;
@@ -71,6 +75,7 @@ bool PlayerShadow::isPositionSwapCoolingDown() const {
 }
 
 float PlayerShadow::getPositionSwapCooldownProgress() const {
+    // 刚释放时为 0，十秒内逐渐增加到 1，供 UI 从下向上填充。
     return 1.0F - positionSwapCooldown_ / POSITION_SWAP_COOLDOWN;
 }
 

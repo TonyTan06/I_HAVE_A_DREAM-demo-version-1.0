@@ -15,6 +15,7 @@ public:
 
     void update(const Player& player, float deltaTime); // 更新距离、生成、重力和持续时间
     void resetPlayerTracking(const Player& player); // 玩家瞬移后重置距离跟踪
+    // platformY 是主地面屏幕 y；entityWidth/Height 是影子模型和碰撞框尺寸。
     void draw(float platformY, float entityWidth, float entityHeight) const;
 
     bool hasShadow() const; // 当前是否存在影子实体
@@ -31,5 +32,5 @@ private:
 
     static constexpr float SPAWN_DISTANCE = 300.0F; // 生成影子所需累计距离
     static constexpr float LIFETIME = 10.0F; // 影子存在时间上限
-    static constexpr float DODGE_DISTANCE_MULTIPLIER = 0.33F; // 闪避位移计入进度的比例
+    static constexpr float DODGE_DISTANCE_MULTIPLIER = 0.33F; // 240px 闪避只累计 79.2px
 };

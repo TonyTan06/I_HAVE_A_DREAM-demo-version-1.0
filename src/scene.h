@@ -13,10 +13,10 @@
 
 class Scene {
 public:
-    Scene();
+    Scene(); // 创建玩家、敌军、主平台、头顶平台以及各功能系统
 
-    void update(float deltaTime);
-    void draw() const;
+    void update(float deltaTime); // 每帧调用各实体和系统，不在 Scene 内保存技能算法
+    void draw() const; // 绘制场景实体、HUD、状态条和攻击特效
 
 private:
     Player player_; // 受键盘控制的主角实体

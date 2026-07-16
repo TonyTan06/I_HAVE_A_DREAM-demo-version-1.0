@@ -117,15 +117,18 @@ void Enemy::attack()
 
 bool Enemy::tryAttack()
 {
+    // 死亡状态和冷却未完成时都不能创建本次攻击。
     if (!isAlive()) return false;
     if (timeSinceLastAttack_ < attackCooldown_) return false;
 
+    // 只有成功取得攻击机会才消耗冷却。
     resetAttackCooldown();
     return true;
 }
 
 bool Enemy::attack(Character& target)
 {
+    // 同阵营单位直接被过滤，也不会消耗本次攻击冷却。
     if (target.getFaction() == getFaction()) return false;
     if (!tryAttack()) return false;
 

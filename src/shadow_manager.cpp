@@ -15,10 +15,12 @@ ShadowManager::ShadowManager(const Player& player)
 }
 
 void ShadowManager::update(const Player& player, float deltaTime) {
+    // 用相邻两帧坐标差累计实际路程，因此玩家折返移动也会增加进度。
     const float frameHorizontalDistance = std::abs(player.getX() - previousPlayerX_);
     previousPlayerX_ = player.getX();
 
     if (shadow_.has_value()) {
+        // 影子存在期间停止记录生成距离，只更新实体和十秒生命周期。
         shadow_->update(deltaTime);
         if (shadow_->getY() <= 0.0F) {
             shadow_->land();
@@ -44,12 +46,14 @@ void ShadowManager::update(const Player& player, float deltaTime) {
     accumulatedHorizontalDistance_ +=
         normalDistance + dodgeDistance * DODGE_DISTANCE_MULTIPLIER;
     if (accumulatedHorizontalDistance_ >= SPAWN_DISTANCE) {
+        // 实体生成在本轮开始时保存的记录点，而不是玩家当前坐标。
         shadow_.emplace(player, recordedPlayerX_, recordedPlayerY_);
         elapsedLifetime_ = 0.0F;
     }
 }
 
 void ShadowManager::resetPlayerTracking(const Player& player) {
+    // 复活或传送后同步上一帧位置，避免把瞬移距离误算为移动进度。
     previousPlayerX_ = player.getX();
     accumulatedHorizontalDistance_ = 0.0F;
 }
@@ -57,6 +61,7 @@ void ShadowManager::resetPlayerTracking(const Player& player) {
 void ShadowManager::draw(
     float platformY, float entityWidth, float entityHeight) const {
     if (!shadow_.has_value()) {
+        // 尚未生成时显示半透明记录点预览模型。
         DrawRectangle(static_cast<int>(recordedPlayerX_),
                       static_cast<int>(platformY - entityHeight - recordedPlayerY_),
                       static_cast<int>(entityWidth), static_cast<int>(entityHeight),
@@ -72,6 +77,7 @@ void ShadowManager::draw(
     const int timeBarY = static_cast<int>(hitbox.y - 11.0F);
     const int barWidth = static_cast<int>(entityWidth);
 
+    // 影子本体仍显示实体碰撞框，但没有血量条；顶部只绘制绿色剩余时间条。
     DrawRectangle(static_cast<int>(hitbox.x), static_cast<int>(hitbox.y),
                   static_cast<int>(entityWidth), static_cast<int>(entityHeight),
                   Color{72, 183, 255, 100});
