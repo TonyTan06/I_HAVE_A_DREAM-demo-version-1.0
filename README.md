@@ -32,6 +32,12 @@ I have a dream 群里的东西。
 docker compose up --build
 ```
 
+构建完成后，在浏览器中打开：
+
+```
+http://localhost:6080/vnc.html?autoconnect=true&resize=scale
+```
+
 #### 创建一个branch，先：
 - git switch main
 - git pull origin main
