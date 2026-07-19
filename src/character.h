@@ -18,7 +18,7 @@ public:
     void moveLeft(float deltaTime); //左移
     //deltaTime 是上一帧到当前帧经过了多少秒。
     virtual void jump(); //跳跃
-    void takeDamage(float damage); //受击伤害
+    virtual void takeDamage(float damage); //受击伤害；无血量实体可以覆写为空操作
     void heal(float value); //回血量
     virtual void attack(); //通用攻击代码
     // 远程攻击框架。具体投射物、伤害、冷却和特效由派生角色自行实现。
@@ -34,6 +34,7 @@ public:
     void land(); //将角色放回地面并重置竖直速度
     void landAtHeight(float height); //让角色站在指定离地高度并重置竖直速度
     void beginFalling(); //角色走出高处平台时解除落地状态并开始受重力影响
+    void swapPositionAndPhysics(Character& other); //交换坐标、竖直速度和落地状态
     float getMoveSpeed() const;
     float getPhysicalDefense() const;
     float getMagicalDefense() const;

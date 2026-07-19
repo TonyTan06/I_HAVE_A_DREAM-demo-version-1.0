@@ -2,7 +2,6 @@
 
 #include "melee_enemy.h"
 #include "player.h"
-#include "player_shadow.h"
 
 #include <gtest/gtest.h>
 
@@ -14,28 +13,25 @@ CombatSystem makeCombatSystem() {
 
 TEST(CombatSystemTest, FindsNearestValidEnemyTarget) {
     Player player("Player");
-    player.setPosition(200.0F, 0.0F);
-    PlayerShadow shadow(player, 100.0F, 0.0F);
+    player.setPosition(100.0F, 0.0F);
     MeleeEnemy enemy(player);
     enemy.setPosition(0.0F, 0.0F);
     CombatSystem system = makeCombatSystem();
 
-    EXPECT_EQ(system.findNearestEnemyTarget(enemy, player, &shadow), &shadow);
+    EXPECT_EQ(system.findNearestEnemyTarget(enemy, player), &player);
 }
 
-TEST(CombatSystemTest, PlayerMeleePrioritizesShadowBeforeEnemy) {
+TEST(CombatSystemTest, PlayerMeleeTargetsEnemy) {
     Player player("Player");
     player.setPosition(100.0F, 0.0F);
-    PlayerShadow shadow(player, 132.0F, 0.0F);
     MeleeEnemy enemy(player);
     enemy.setPosition(132.0F, 0.0F);
     CombatSystem system = makeCombatSystem();
 
-    const auto result = system.playerMeleeAttack(player, &shadow, {&enemy}, 360.0F);
+    const auto result = system.playerMeleeAttack(player, {&enemy}, 360.0F);
 
-    EXPECT_EQ(result.target, &shadow);
-    EXPECT_FLOAT_EQ(shadow.getHealth(), shadow.getMaxHealth() - player.getAttackDamage());
-    EXPECT_FLOAT_EQ(enemy.getHealth(), enemy.getMaxHealth());
+    EXPECT_EQ(result.target, &enemy);
+    EXPECT_FLOAT_EQ(enemy.getHealth(), enemy.getMaxHealth() - player.getAttackDamage());
 }
 
 TEST(CombatSystemTest, EnemyMeleeCanBeBlockedByPlayerDefense) {
@@ -47,26 +43,10 @@ TEST(CombatSystemTest, EnemyMeleeCanBeBlockedByPlayerDefense) {
     enemy.update(0.5F);
     CombatSystem system = makeCombatSystem();
 
-    const auto result = system.enemyMeleeAttack(enemy, player, nullptr, 360.0F);
+    const auto result = system.enemyMeleeAttack(enemy, player, 360.0F);
 
     EXPECT_TRUE(result.blocked);
     EXPECT_FLOAT_EQ(player.getHealth(), player.getMaxHealth());
-}
-
-TEST(CombatSystemTest, EnemyMeleeDamagesShadowWhenItIsNearest) {
-    Player player("Player");
-    player.setPosition(500.0F, 0.0F);
-    PlayerShadow shadow(player, 100.0F, 0.0F);
-    MeleeEnemy enemy(player);
-    enemy.setPosition(116.0F, 0.0F);
-    enemy.update(0.5F);
-    CombatSystem system = makeCombatSystem();
-
-    const auto result = system.enemyMeleeAttack(enemy, player, &shadow, 360.0F);
-
-    EXPECT_EQ(result.target, &shadow);
-    EXPECT_TRUE(result.hit);
-    EXPECT_FLOAT_EQ(shadow.getHealth(), shadow.getMaxHealth() - enemy.getAttackDamage());
 }
 
 TEST(CombatSystemTest, MeleeEnemyOnlyDetectsTargetsWithinItsOwnRange) {
@@ -76,10 +56,10 @@ TEST(CombatSystemTest, MeleeEnemyOnlyDetectsTargetsWithinItsOwnRange) {
     enemy.setPosition(100.0F, 0.0F);
 
     player.setPosition(251.0F, 0.0F);
-    EXPECT_EQ(system.findNearestEnemyTarget(enemy, player, nullptr), nullptr);
+    EXPECT_EQ(system.findNearestEnemyTarget(enemy, player), nullptr);
 
     player.setPosition(250.0F, 0.0F);
-    EXPECT_EQ(system.findNearestEnemyTarget(enemy, player, nullptr), &player);
+    EXPECT_EQ(system.findNearestEnemyTarget(enemy, player), &player);
 }
 
 TEST(CombatSystemTest, MeleeEnemyTurnsRightBeforeHittingRightSideTarget) {
@@ -90,7 +70,7 @@ TEST(CombatSystemTest, MeleeEnemyTurnsRightBeforeHittingRightSideTarget) {
     player.setPosition(132.0F, 0.0F);
     enemy.update(0.5F);
 
-    const auto result = system.enemyMeleeAttack(enemy, player, nullptr, 360.0F);
+    const auto result = system.enemyMeleeAttack(enemy, player, 360.0F);
 
     EXPECT_TRUE(enemy.isFacingRight());
     EXPECT_TRUE(result.hit);

@@ -101,6 +101,13 @@ void Character::beginFalling() {
     isGrounded_ = false;
 }
 
+void Character::swapPositionAndPhysics(Character& other) {
+    std::swap(x_, other.x_);
+    std::swap(y_, other.y_);
+    std::swap(verticalVelocity_, other.verticalVelocity_);
+    std::swap(isGrounded_, other.isGrounded_);
+}
+
 float Character::getMoveSpeed() const {
     return moveSpeed_;
 }

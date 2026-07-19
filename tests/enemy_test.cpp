@@ -7,6 +7,21 @@ TEST(EnemyTest, StartsAliveAndHasNoLootByDefault) {
 
     EXPECT_TRUE(enemy.isAlive());
     EXPECT_TRUE(enemy.dropLoot().empty());
+    EXPECT_FALSE(enemy.isFacingRight());
+}
+
+TEST(EnemyTest, FacesTowardTargetsOnEitherSide) {
+    Enemy enemy("Enemy");
+    Character target("Target");
+    enemy.setPosition(300.0F, 0.0F);
+
+    target.setPosition(400.0F, 0.0F);
+    enemy.faceToward(target);
+    EXPECT_TRUE(enemy.isFacingRight());
+
+    target.setPosition(200.0F, 0.0F);
+    enemy.faceToward(target);
+    EXPECT_FALSE(enemy.isFacingRight());
 }
 
 TEST(EnemyTest, CalculatesExperienceRewardFromEnemyLevel) {

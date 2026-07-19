@@ -12,6 +12,7 @@ Enemy::Enemy(std::string name, int level)
       level_(std::max(1, level)), //敌军等级最低为 1，避免生成无效等级敌军
       experienceReward_(5 * level_), //击杀经验奖励，当前使用 f(x) = 5x
       isAggro_(false), //是否进入仇恨状态
+      isFacingRight_(false), //敌军默认面向左侧玩家出生区域
       attackCooldown_(1.0F), //攻击冷却时间
       timeSinceLastAttack_(0.0F), //自上次攻击以来的时间
       isRespawning_(false),
@@ -92,6 +93,21 @@ float Enemy::getDetectionRange() const
     return detectionRange_;
 }
 
+bool Enemy::isFacingRight() const
+{
+    return isFacingRight_;
+}
+
+void Enemy::faceToward(const Character& target)
+{
+    // 目标与敌军同一水平位置时保留原朝向，避免每帧来回切换。
+    if (target.getX() > getX()) {
+        isFacingRight_ = true;
+    } else if (target.getX() < getX()) {
+        isFacingRight_ = false;
+    }
+}
+
 void Enemy::attack()
 {
     if (!tryAttack()) return;
@@ -101,15 +117,18 @@ void Enemy::attack()
 
 bool Enemy::tryAttack()
 {
+    // 死亡状态和冷却未完成时都不能创建本次攻击。
     if (!isAlive()) return false;
     if (timeSinceLastAttack_ < attackCooldown_) return false;
 
+    // 只有成功取得攻击机会才消耗冷却。
     resetAttackCooldown();
     return true;
 }
 
 bool Enemy::attack(Character& target)
 {
+    // 同阵营单位直接被过滤，也不会消耗本次攻击冷却。
     if (target.getFaction() == getFaction()) return false;
     if (!tryAttack()) return false;
 

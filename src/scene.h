@@ -9,14 +9,14 @@
 #include "projectile_system.h"
 #include "ranged_enemy.h"
 #include "raylib.h"
-#include "shadow_system.h"
+#include "shadow_manager.h"
 
 class Scene {
 public:
-    Scene();
+    Scene(); // 创建玩家、敌军、主平台、头顶平台以及各功能系统
 
-    void update(float deltaTime);
-    void draw() const;
+    void update(float deltaTime); // 每帧调用各实体和系统，不在 Scene 内保存技能算法
+    void draw() const; // 绘制场景实体、HUD、状态条和攻击特效
 
 private:
     Player player_; // 受键盘控制的主角实体
@@ -25,7 +25,7 @@ private:
     RangedEnemy rangedEnemy_; // 平台右侧生成的远程敌军
     float playerSpawnX_; // 玩家死亡后复活使用的出生点 x 坐标
     float playerSpawnY_; // 玩家死亡后复活使用的出生点 y 坐标
-    ShadowSystem shadowSystem_; // 统一管理影子记录点、生成规则、生命周期和绘制
+    ShadowManager shadowManager_; // 只管理影子记录点、生成距离、生命周期和销毁
     CombatSystem combatSystem_; // 统一管理近战目标选择、攻击框、防御与伤害结算
     Rectangle platform_; // 平台的位置与尺寸，同时定义地面高度
     PlatformSystem platformSystem_; // 管理敌军头顶的可站立单向平台
@@ -34,6 +34,7 @@ private:
     float damageTextY_; // 最近一次伤害数字的绘制 y 坐标
     float displayedDamage_; // 最近一次命中的伤害数值
     float attackEffectElapsedTime_; // 玩家白色近战特效的剩余显示时间
+    float shadowAttackEffectElapsedTime_; // 技能 1 影子白色近战特效的剩余显示时间
     float meleeAttackEffectElapsedTime_; // 敌军粉色近战特效的剩余显示时间
     bool meleeEnemyExperienceAwarded_; // 本次近战兵死亡是否已经奖励过经验
     bool rangedEnemyExperienceAwarded_; // 本次远程兵死亡是否已经奖励过经验
@@ -55,4 +56,10 @@ private:
     // 根据角色的逻辑坐标和平台地面位置，统一创建屏幕空间中的角色碰撞箱。
     static Rectangle makeCharacterHitbox(
         const Character& character, const Rectangle& platform);
+    // 在角色背向绘制统一的绿色竖直冷却条。
+    static void drawBackVerticalCooldownBar(
+        const Character& character, bool facingRight,
+        float characterTop, float cooldownProgress);
+    // 统一设置最近一次伤害数字的内容、位置和显示时间。
+    void showDamageText(float damage, float textX, float textY);
 };
